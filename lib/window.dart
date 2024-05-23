@@ -18,7 +18,13 @@ class _MainWindowState extends State<Main_window> {
       home: SafeArea(
         child: Scaffold(
           appBar: AppBar(
-            title: const Text('Aloe Vera'),
+            title: const Center(
+              child: Text(
+                'Aeolus',
+                style: TextStyle(
+                ),
+              ),
+            ),
             backgroundColor: Colors.white.withOpacity(0.5),
           ),
           backgroundColor: const Color(0xFFDCE3EA), // Set background color here
@@ -63,202 +69,200 @@ class _MainWindowState extends State<Main_window> {
 
   Widget _buildHomePage() {
     return SingleChildScrollView(
-      child: Container(
-        decoration: BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage('images/Trees.png'),
-            fit: BoxFit.fitWidth,
-            alignment: Alignment.bottomCenter,
-          ),
+        child: Container(
+      decoration: BoxDecoration(
+        image: DecorationImage(
+          image: AssetImage('images/Trees.png'),
+          fit: BoxFit.fitWidth,
+          alignment: Alignment.bottomCenter,
         ),
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            children: [
-              const SizedBox(height: 20),
-              const Center(
-                child: Text(
-                  'My Location',
-                  style: TextStyle(fontSize: 40, fontWeight: FontWeight.w500),
-                ),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            const SizedBox(height: 20),
+            const Center(
+              child: Text(
+                'My Location',
+                style: TextStyle(fontSize: 40, fontWeight: FontWeight.w500),
               ),
-              const Center(
-                child: Text(
-                  '<location_name>',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
+            ),
+            const Center(
+              child: Text(
+                '<location_name>',
+                style: TextStyle(fontWeight: FontWeight.bold),
               ),
-              const SizedBox(height: 20),
-              Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Image.asset('images/SUN.png'),
-                  const SizedBox(height: 10),
-                  Container(
-                    decoration: BoxDecoration(
-                      boxShadow: [
-                        BoxShadow(
-                          color: Color(0xFFB2E4FA).withOpacity(0.3),
-                          offset: Offset(0, 4),
-                          blurRadius: 4,
-                          spreadRadius: 0,
-                        ),
-                      ],
-                      color: Colors.white.withOpacity(0.3),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    padding: const EdgeInsets.all(16),
-                    margin: const EdgeInsets.all(16),
-                    child: const Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Text('16°', style: TextStyle(fontSize: 80)),
-                        Text('<weather_conditions>'),
-                        Text('H:<today_high>    L:<today_low>'),
-                      ],
-                    ),
+            ),
+            const SizedBox(height: 20),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Image.asset('images/SUN.png'),
+                const SizedBox(height: 10),
+                Container(
+                  decoration: BoxDecoration(
+                    boxShadow: [
+                      BoxShadow(
+                        color: Color(0xFFB2E4FA).withOpacity(0.3),
+                        offset: Offset(0, 4),
+                        blurRadius: 4,
+                        spreadRadius: 0,
+                      ),
+                    ],
+                    color: Colors.white.withOpacity(0.3),
+                    borderRadius: BorderRadius.circular(20),
                   ),
-                ],
-              ),
-              Container(
-                decoration: BoxDecoration(
-                  boxShadow: [
-                    BoxShadow(
-                      color: Color(0xFFB2E4FA).withOpacity(0.3),
-                      offset: Offset(0, 4),
-                      blurRadius: 4,
-                      spreadRadius: 0,
-                    ),
-                  ],
-                  color: Colors.white.withOpacity(0.3),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                padding: const EdgeInsets.all(16),
-                margin: const EdgeInsets.all(16),
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
+                  padding: const EdgeInsets.all(16),
+                  margin: const EdgeInsets.all(16),
+                  child: const Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      Column(
-                        children: [
-                          const Center(
-                            child: Text('1pm'),
-                          ),
-                          Image.asset('images/cloud.png'),
-                          const Center(
-                            child: Text(
-                              '17°',
-                              style: TextStyle(
-                                  fontSize: 20, fontWeight: FontWeight.bold),
-                            ),
-                          )
-                        ],
-                      ),
-                      const SizedBox(width: 28),
-                      Column(
-                        children: [
-                          const Center(
-                            child: Text('2pm'),
-                          ),
-                          Image.asset('images/cloud.png'),
-                          const Center(
-                            child: Text(
-                              '15°',
-                              style: TextStyle(
-                                  fontSize: 20, fontWeight: FontWeight.bold),
-                            ),
-                          )
-                        ],
-                      ),
-                      const SizedBox(width: 28),
-                      Column(
-                        children: [
-                          const Center(
-                            child: Text('3pm'),
-                          ),
-                          Image.asset('images/cloud.png'),
-                          const Center(
-                            child: Text(
-                              '13°',
-                              style: TextStyle(
-                                  fontSize: 20, fontWeight: FontWeight.bold),
-                            ),
-                          )
-                        ],
-                      ),
-                      const SizedBox(width: 28),
-                      Column(
-                        children: [
-                          const Center(
-                            child: Text('4pm'),
-                          ),
-                          Image.asset('images/cloud.png'),
-                          const Center(
-                            child: Text(
-                              '12°',
-                              style: TextStyle(
-                                  fontSize: 20, fontWeight: FontWeight.bold),
-                            ),
-                          )
-                        ],
-                      ),
-                      const SizedBox(width: 28),
-                      Column(
-                        children: [
-                          const Center(
-                            child: Text('5pm'),
-                          ),
-                          Image.asset('images/cloud.png'),
-                          const Center(
-                            child: Text(
-                              '11°',
-                              style: TextStyle(
-                                  fontSize: 20, fontWeight: FontWeight.bold),
-                            ),
-                          )
-                        ],
-                      ),
-                      const SizedBox(width: 28),
-                      Column(
-                        children: [
-                          const Center(
-                            child: Text('6pm'),
-                          ),
-                          Image.asset('images/cloud.png'),
-                          const Center(
-                            child: Text(
-                              '20°',
-                              style: TextStyle(
-                                  fontSize: 20, fontWeight: FontWeight.bold),
-                            ),
-                          )
-                        ],
-                      )
+                      Text('16°', style: TextStyle(fontSize: 80)),
+                      Text('<weather_conditions>'),
+                      Text('H:<today_high>    L:<today_low>'),
                     ],
                   ),
                 ),
-              ),
-              Container(
-                decoration: const BoxDecoration(
-                  image: DecorationImage(
-                    image: AssetImage('images/Trees.png'), // Path to your image asset
-                    fit: BoxFit.cover, // Adjust this according to your needs
+              ],
+            ),
+            Container(
+              decoration: BoxDecoration(
+                boxShadow: [
+                  BoxShadow(
+                    color: Color(0xFFB2E4FA).withOpacity(0.3),
+                    offset: Offset(0, 4),
+                    blurRadius: 4,
+                    spreadRadius: 0,
                   ),
+                ],
+                color: Colors.white.withOpacity(0.3),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              padding: const EdgeInsets.all(16),
+              margin: const EdgeInsets.all(16),
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Column(
+                      children: [
+                        const Center(
+                          child: Text('1pm'),
+                        ),
+                        Image.asset('images/cloud.png'),
+                        const Center(
+                          child: Text(
+                            '17°',
+                            style: TextStyle(
+                                fontSize: 20, fontWeight: FontWeight.bold),
+                          ),
+                        )
+                      ],
+                    ),
+                    const SizedBox(width: 28),
+                    Column(
+                      children: [
+                        const Center(
+                          child: Text('2pm'),
+                        ),
+                        Image.asset('images/cloud.png'),
+                        const Center(
+                          child: Text(
+                            '15°',
+                            style: TextStyle(
+                                fontSize: 20, fontWeight: FontWeight.bold),
+                          ),
+                        )
+                      ],
+                    ),
+                    const SizedBox(width: 28),
+                    Column(
+                      children: [
+                        const Center(
+                          child: Text('3pm'),
+                        ),
+                        Image.asset('images/cloud.png'),
+                        const Center(
+                          child: Text(
+                            '13°',
+                            style: TextStyle(
+                                fontSize: 20, fontWeight: FontWeight.bold),
+                          ),
+                        )
+                      ],
+                    ),
+                    const SizedBox(width: 28),
+                    Column(
+                      children: [
+                        const Center(
+                          child: Text('4pm'),
+                        ),
+                        Image.asset('images/cloud.png'),
+                        const Center(
+                          child: Text(
+                            '12°',
+                            style: TextStyle(
+                                fontSize: 20, fontWeight: FontWeight.bold),
+                          ),
+                        )
+                      ],
+                    ),
+                    const SizedBox(width: 28),
+                    Column(
+                      children: [
+                        const Center(
+                          child: Text('5pm'),
+                        ),
+                        Image.asset('images/cloud.png'),
+                        const Center(
+                          child: Text(
+                            '11°',
+                            style: TextStyle(
+                                fontSize: 20, fontWeight: FontWeight.bold),
+                          ),
+                        )
+                      ],
+                    ),
+                    const SizedBox(width: 28),
+                    Column(
+                      children: [
+                        const Center(
+                          child: Text('6pm'),
+                        ),
+                        Image.asset('images/cloud.png'),
+                        const Center(
+                          child: Text(
+                            '20°',
+                            style: TextStyle(
+                                fontSize: 20, fontWeight: FontWeight.bold),
+                          ),
+                        )
+                      ],
+                    )
+                  ],
                 ),
               ),
-            ],
-          ),
+            ),
+            Container(
+              decoration: const BoxDecoration(
+                image: DecorationImage(
+                  image: AssetImage(
+                      'images/Trees.png'), // Path to your image asset
+                  fit: BoxFit.cover, // Adjust this according to your needs
+                ),
+              ),
+            ),
+          ],
         ),
-      )
-
-    );
+      ),
+    ));
   }
-
 
   Widget _buildSimplePage(String title) {
     return Card(
