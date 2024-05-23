@@ -21,14 +21,14 @@ class _MainWindowState extends State<Main_window> {
             title: const Center(
               child: Text(
                 'Aeolus',
-                style: TextStyle(
-                ),
+                style: TextStyle(),
               ),
             ),
             backgroundColor: Colors.white.withOpacity(0.5),
           ),
           backgroundColor: const Color(0xFFDCE3EA), // Set background color here
           bottomNavigationBar: NavigationBar(
+            indicatorColor: Colors.green,
             backgroundColor: Colors.white.withOpacity(0.5),
             onDestinationSelected: (int index) {
               setState(() {
@@ -59,7 +59,7 @@ class _MainWindowState extends State<Main_window> {
             children: [
               _buildHomePage(),
               _buildSimplePage('Bookmarks page'),
-              _buildSimplePage('Settings page'),
+              _buildSettingsPage(),
             ],
           ),
         ),
@@ -70,7 +70,7 @@ class _MainWindowState extends State<Main_window> {
   Widget _buildHomePage() {
     return SingleChildScrollView(
         child: Container(
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         image: DecorationImage(
           image: AssetImage('images/Trees.png'),
           fit: BoxFit.fitWidth,
@@ -106,8 +106,8 @@ class _MainWindowState extends State<Main_window> {
                   decoration: BoxDecoration(
                     boxShadow: [
                       BoxShadow(
-                        color: Color(0xFFB2E4FA).withOpacity(0.3),
-                        offset: Offset(0, 4),
+                        color: const Color(0xFFB2E4FA).withOpacity(0.3),
+                        offset: const Offset(0, 4),
                         blurRadius: 4,
                         spreadRadius: 0,
                       ),
@@ -133,8 +133,8 @@ class _MainWindowState extends State<Main_window> {
               decoration: BoxDecoration(
                 boxShadow: [
                   BoxShadow(
-                    color: Color(0xFFB2E4FA).withOpacity(0.3),
-                    offset: Offset(0, 4),
+                    color: const Color(0xFFB2E4FA).withOpacity(0.3),
+                    offset: const Offset(0, 4),
                     blurRadius: 4,
                     spreadRadius: 0,
                   ),
@@ -262,6 +262,66 @@ class _MainWindowState extends State<Main_window> {
         ),
       ),
     ));
+  }
+
+  Widget _buildSettingsPage() {
+    return Card(
+      shadowColor: Colors.transparent,
+      child: Container(
+        child: Padding(
+        padding: const EdgeInsets.all(5.0), // Border padding 5.0 or 16.0
+          child: ListView(
+            children: [
+              ListTile(
+                leading: const Icon(Icons.notifications),
+                title: const Text('Notifications'),
+                subtitle: const Text('Notification preferences'),
+                onTap: () {
+                  // Navigate to notification settings
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.storage_outlined),
+                title: const Text('Storage & Data'),
+                subtitle: const Text('Privacy settings and security options'),
+                onTap: () {
+                  // Navigate to privacy & security settings
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.language),
+                title: const Text('Language'),
+                subtitle: const Text('Change language preferences'),
+                onTap: () {
+                  // Navigate to language settings
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.light_mode_outlined),
+                title: const Text('Theme'),
+                subtitle: const Text('Get help and support'),
+                onTap: () {
+                  // Navigate to help & support
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.account_circle),
+                title: const Text('Website'),
+                subtitle: const Text('Find out more on the web!'),
+                onTap: () {
+                  // Open website homepage
+                },
+              ),
+              const ListTile(
+                leading: Icon(Icons.info),
+                title: Text('About'),
+                  subtitle: Text('Version: 0.0.2'),
+              ),
+            ],
+          )
+    ),
+      ),
+    );
   }
 
   Widget _buildSimplePage(String title) {
