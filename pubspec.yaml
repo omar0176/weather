@@ -60,9 +60,21 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
-    - images/SUN.png
-    - images/cloud.png
-    - images/Trees.png
+    - images/Sunny/SUN.png
+    - images/Sunny/Trees.png
+    - images/Snowy/snow cloud.png
+    - images/Snowy/snow mountains.png
+    - images/Rainy/Rainy cloud.png
+    - images/Rainy/Trees(rainy).png
+    - images/Night/clouds (night).png
+    - images/Night/Moon.png
+    - images/Cloudy/clouds (cloudy).png
+    - images/Cloudy/sun cloudy.png
+    - images/Symbols/cloud.png
+    - images/Symbols/cloud-drizzle.png
+    - images/Symbols/cloud-lightning.png
+    - images/Symbols/cloud-snow.png
+    - images/Symbols/sun logo.png
   # assets:
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
