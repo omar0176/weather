@@ -12,7 +12,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: Main_window(),
+      home: MainWindow(), // forwards to the main page of the app
     );
   }
 }

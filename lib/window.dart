@@ -1,19 +1,19 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:weather/bookmarksPage.dart';
-import 'package:weather/settingsPage.dart';
-import 'homePage.dart';
+import 'package:weather/bookmarks_page.dart';
+import 'package:weather/settings_page.dart';
+import 'home_page.dart';
 
-class Main_window extends StatefulWidget {
-  const Main_window({super.key});
+class MainWindow extends StatefulWidget {
+  const MainWindow({super.key});
 
   @override
-  State<Main_window> createState() => _MainWindowState();
+  State<MainWindow> createState() => _MainWindowState();
 }
 
-int currentPageIndex = 0;
+int currentPageIndex = 0; // Index of the current page
 
-class _MainWindowState extends State<Main_window> {
+class _MainWindowState extends State<MainWindow> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -22,20 +22,23 @@ class _MainWindowState extends State<Main_window> {
         child: Scaffold(
           appBar: AppBar(
             title: const Center(
-              child: Text('Aeolus'),
+              child: Text('Aeolus'), // App title
             ),
-            backgroundColor: Colors.white.withOpacity(0.5),
+            backgroundColor:
+                Colors.white.withOpacity(0.5), // Title background color
           ),
-          backgroundColor: const Color(0xFFDCE3EA), // Set background color here
+          backgroundColor: const Color(0xFFDCE3EA), // Page background color
           bottomNavigationBar: NavigationBar(
-            indicatorColor: Colors.green,
-            backgroundColor: Colors.white.withOpacity(0.5),
+            indicatorColor: Colors.green, // Indicator color
+            backgroundColor: Colors.white
+                .withOpacity(0.5), // navigation bar background color
             onDestinationSelected: (int index) {
               setState(() {
-                currentPageIndex = index;
+                currentPageIndex = index; // Sets the current page index
               });
             },
             destinations: const [
+              // Navigation destinations
               NavigationDestination(
                 icon: Icon(Icons.home_outlined),
                 selectedIcon: Icon(Icons.home),
@@ -52,7 +55,7 @@ class _MainWindowState extends State<Main_window> {
                 label: 'Settings',
               ),
             ],
-            selectedIndex: currentPageIndex,
+            selectedIndex: currentPageIndex, // Selected index
           ),
           body: IndexedStack(
             index: currentPageIndex,
