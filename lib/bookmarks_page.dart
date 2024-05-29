@@ -71,7 +71,7 @@ class _BookmarksPageState extends State<BookmarksPage> {
                   ],
                   color: Colors.white.withOpacity(0.3), // bookmark color
                   borderRadius:
-                      BorderRadius.circular(20), // bookmark corner radius
+                  BorderRadius.circular(20), // bookmark corner radius
                 ),
                 padding: const EdgeInsets.all(5), // bookmark padding
                 margin: const EdgeInsets.all(3),
