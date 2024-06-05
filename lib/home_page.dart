@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
+import 'package:geocoding/geocoding.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -20,6 +21,7 @@ class HomePageState extends State<HomePage> {
   String _location = "";
   String _highTemp = "--";
   String _lowTemp = "--";
+  TextEditingController _searchController = TextEditingController();
 
   List<Map<String, dynamic>> _hourlyForecast = [];
 
@@ -46,13 +48,11 @@ class HomePageState extends State<HomePage> {
 
   @override
   void initState() {
-    // geolocator
     super.initState();
     _getCurrentLocation();
   }
 
   void _toggleTextBox() {
-    // Function to toggle the dialog box on and off
     setState(() {
       _isDialogVisible = !_isDialogVisible;
     });
@@ -92,8 +92,7 @@ class HomePageState extends State<HomePage> {
         desiredAccuracy: LocationAccuracy.high);
 
     _fetchWeather(position.latitude, position.longitude);
-    _fetchHourlyForecast(position.latitude,
-        position.longitude); // Call the _fetchHourlyForecast() method here
+    _fetchHourlyForecast(position.latitude, position.longitude); // Call the _fetchHourlyForecast() method here
   }
 
   Future<void> _fetchHourlyForecast(double latitude, double longitude) async {
@@ -109,7 +108,7 @@ class HomePageState extends State<HomePage> {
         _hourlyForecast = hourlyForecasts.where((forecast) {
           final DateTime forecastTime =
               DateTime.fromMillisecondsSinceEpoch(forecast['dt'] * 1000);
-          return forecastTime.isBefore(DateTime.now().add(Duration(hours: 24)));
+          return forecastTime.isBefore(DateTime.now().add(const Duration(hours: 24)));
         }).map((forecast) {
           final DateTime forecastTime =
               DateTime.fromMillisecondsSinceEpoch(forecast['dt'] * 1000);
@@ -150,17 +149,44 @@ class HomePageState extends State<HomePage> {
     }
   }
 
-  Future<DateTime> getCurrentTimeForLocation(
-      double latitude, double longitude) async {
-    final response = await http.get(Uri.parse(
-        'https://api.openweathermap.org/data/2.5/weather?lat=$latitude&lon=$longitude&appid=$_apiKeyOpenweather'));
+  Future<void> _fetchWeatherForSearch(String location) async {
+    try {
+      List<Location> locations = await locationFromAddress(location);
+      if (locations.isNotEmpty) {
+        double latitude = locations[0].latitude;
+        double longitude = locations[0].longitude;
+        _fetchWeather(latitude, longitude);
+        _fetchHourlyForecast(latitude, longitude);
+        setState(() {
+          _location = location;
+        });
+      }
+    } catch (e) {
+      setState(() {
 
-    if (response.statusCode == 200) {
-      final data = json.decode(response.body);
-      final timeZoneOffset = data['timezone'];
-      return DateTime.now().add(Duration(seconds: timeZoneOffset));
-    } else {
-      throw Exception('Failed to get current time for location');
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text("Location doesn't exist"),
+              content: const Text("Please enter a valid location."),
+              actions: [
+                Center(
+                  child: SizedBox(
+                    width: 100,
+                    child: TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      child: const Center(child: Text('OK')),
+                    ),
+                  ),
+                ),
+              ],
+            );
+          }
+        );
+      });
     }
   }
 
@@ -168,19 +194,16 @@ class HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: GestureDetector(
-        // Gesture Detector to disable searchbar when tapped
         onTap: () {
           if (_isDialogVisible) {
             _toggleTextBox();
           }
         },
         child: Stack(
-          // Stack to overlay the Searchbar on the main page
           children: [
             LayoutBuilder(
               builder: (context, constraints) {
                 return SingleChildScrollView(
-                  // Scrollable widget
                   child: ConstrainedBox(
                     constraints: BoxConstraints(
                       minHeight: constraints.maxHeight,
@@ -188,20 +211,17 @@ class HomePageState extends State<HomePage> {
                     child: Container(
                       decoration: const BoxDecoration(
                         image: DecorationImage(
-                          image: AssetImage(
-                              'images/Sunny/Trees.png'), // Background image
-                          fit: BoxFit.fitWidth, // Image fit the width
+                          image: AssetImage('images/Sunny/Trees.png'),
+                          fit: BoxFit.fitWidth,
                           alignment: Alignment.bottomCenter,
                         ),
                       ),
                       child: Padding(
-                        padding: const EdgeInsets.all(
-                            16.0), // Padding around the main content
+                        padding: const EdgeInsets.all(16.0),
                         child: Column(
                           children: [
-                            const SizedBox(height: 20), // spacing
+                            const SizedBox(height: 20),
                             OutlinedButton.icon(
-                              // Button to toggle the search bar
                               onPressed: _toggleTextBox,
                               icon: const Icon(
                                 Icons.search,
@@ -227,14 +247,14 @@ class HomePageState extends State<HomePage> {
                                     fontWeight: FontWeight.bold, fontSize: 24),
                               ),
                             ),
-                            const SizedBox(height: 20), //spacing
+                            const SizedBox(height: 20),
                             Column(
-                              mainAxisAlignment: MainAxisAlignment.center, // centering the content
+                              mainAxisAlignment: MainAxisAlignment.center,
                               crossAxisAlignment: CrossAxisAlignment.center,
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Image.asset('images/Sunny/SUN.png'), // Image of the sun
-                                const SizedBox(height: 10), // spacing
+                                Image.asset('images/Sunny/SUN.png'),
+                                const SizedBox(height: 10),
                                 Container(
                                   decoration: BoxDecoration(
                                     boxShadow: [
@@ -264,23 +284,20 @@ class HomePageState extends State<HomePage> {
                               ],
                             ),
                             Container(
-                              // widget design for the today's weather forecast
                               decoration: BoxDecoration(
                                 boxShadow: [
                                   BoxShadow(
                                     color: const Color(0xFFB2E4FA)
-                                        .withOpacity(0.3), //shadow color
-                                    offset: const Offset(0, 4), // offset
+                                        .withOpacity(0.3),
+                                    offset: const Offset(0, 4),
                                     blurRadius: 4,
                                     spreadRadius: 0,
                                   ),
                                 ],
-                                color: Colors.white
-                                    .withOpacity(0.3), // background color
+                                color: Colors.white.withOpacity(0.3),
                                 borderRadius:
-                                    BorderRadius.circular(20), // border corners
+                                BorderRadius.circular(20),
                               ),
-                              // hourly forecast widget
                               padding: const EdgeInsets.all(16),
                               margin: const EdgeInsets.all(16),
                               child: SingleChildScrollView(
@@ -326,44 +343,45 @@ class HomePageState extends State<HomePage> {
                 );
               },
             ),
-            if (_isDialogVisible) // to display the search bar
+            if (_isDialogVisible)
               BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5), // blur effect
+                filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
                 child: Container(
-                  color: Colors.black.withOpacity(0.5), // blur darkening effect
+                  color: Colors.black.withOpacity(0.5),
                   child: Center(
-                      child: Column(
-                    children: [
-                      const SizedBox(height: 40), // spacing
-                      Container(
-                        height: 50,
-                        width: 300,
-                        decoration: BoxDecoration(
-                            // search bar design
-                            color: Colors.white,
-                            border: Border.all(color: Colors.black, width: 1.0),
-                            borderRadius: BorderRadius.circular(10)),
-                        child: TextField(
-                          // search bar text field
-                          inputFormatters: [
-                            FilteringTextInputFormatter.allow(
-                                RegExp(r'[a-zA-Z,\s]'))
-                          ], // Restrict to alphabets and whitespaces
-
-                          decoration: const InputDecoration(
-                            // Text field design
-                            hintText: 'Berlin, Germany',
-                            prefixIcon: Icon(Icons.search),
-                            border: InputBorder.none,
-                            contentPadding: EdgeInsets.symmetric(
-                                vertical: 12.0, horizontal: 12.0),
+                    child: Column(
+                      children: [
+                        const SizedBox(height: 40),
+                        Container(
+                          height: 50,
+                          width: 300,
+                          decoration: BoxDecoration(
+                              color: Colors.white,
+                              border: Border.all(color: Colors.black, width: 1.0),
+                              borderRadius: BorderRadius.circular(10)),
+                          child: TextField(
+                            controller: _searchController,
+                            inputFormatters: [
+                              FilteringTextInputFormatter.allow(
+                                  RegExp(r'[a-zA-Z,\s]'))
+                            ],
+                            decoration: const InputDecoration(
+                              hintText: 'Berlin, Germany',
+                              prefixIcon: Icon(Icons.search),
+                              border: InputBorder.none,
+                              contentPadding: EdgeInsets.symmetric(
+                                  vertical: 12.0, horizontal: 12.0),
+                            ),
+                            onSubmitted: (value) {
+                              _fetchWeatherForSearch(value);
+                              _toggleTextBox();
+                            },
                           ),
                         ),
-                      )
-                    ],
+                      ],
+                    ),
                   ),
                 ),
-              ),
               ),
           ],
         ),
@@ -371,3 +389,4 @@ class HomePageState extends State<HomePage> {
     );
   }
 }
+
