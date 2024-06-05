@@ -22,6 +22,8 @@ class HomePageState extends State<HomePage> {
   String _highTemp = "--";
   String _lowTemp = "--";
   TextEditingController _searchController = TextEditingController();
+  String upperImage = 'images/Sunny/SUN.png';
+  String lowerImage = 'images/Sunny/Trees.png';
 
   List<Map<String, dynamic>> _hourlyForecast = [];
 
@@ -30,18 +32,31 @@ class HomePageState extends State<HomePage> {
   String getWeatherIcon(String weatherIconCode) {
     switch (weatherIconCode) {
       case '01d': // clear sky (day)
+        upperImage = 'images/Sunny/SUN.png';
+        lowerImage = 'images/Sunny/Trees.png';
         return 'images/Symbols/sun logo.png';
       case '02d' || '02n' || '03d' || '03n' || '04d' || '04n': // Cloudy
+        upperImage = 'images/Cloudy/sun cloudy.png';
+        lowerImage = 'images/Cloudy/clouds (cloudy).png';
         return 'images/Symbols/cloud.png';
       case '09d' || '09n' || '10d' || '10n': // rain
-        return 'images/Symbols/rain.png';
+        upperImage = 'images/Rain/Rainy cloud.png';
+        lowerImage = 'images/Rain/Trees(rainy).png';
+        return 'images/Symbols/cloud-drizzle.png';
       case '11d' || '11n': // clear thunderstorm
+        upperImage = 'images/Rain/Rainy cloud.png';
+        lowerImage = 'images/Rain/Trees(rainy).png';
         return 'images/Symbols/thunderstorm.png';
       case '13d' || '13n': // snow
+        upperImage = 'images/Snow/snow cloud.png';
+        lowerImage = 'images/Snow/snow mountains.png';
         return 'images/Symbols/snow.png';
       case '01n':
+        upperImage = 'images/Night/Moon.png';
+        lowerImage = 'images/Night/clouds (night).png';
         return 'images/Symbols/Moon-logo.png'; // clear sky (night)
       default:
+
         return 'images/Symbols/cloud.png';
     }
   }
@@ -209,9 +224,9 @@ class HomePageState extends State<HomePage> {
                       minHeight: constraints.maxHeight,
                     ),
                     child: Container(
-                      decoration: const BoxDecoration(
+                      decoration: BoxDecoration(
                         image: DecorationImage(
-                          image: AssetImage('images/Sunny/Trees.png'),
+                          image: AssetImage(lowerImage),
                           fit: BoxFit.fitWidth,
                           alignment: Alignment.bottomCenter,
                         ),
@@ -253,7 +268,7 @@ class HomePageState extends State<HomePage> {
                               crossAxisAlignment: CrossAxisAlignment.center,
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Image.asset('images/Sunny/SUN.png'),
+                                Image.asset(upperImage),
                                 const SizedBox(height: 10),
                                 Container(
                                   decoration: BoxDecoration(
