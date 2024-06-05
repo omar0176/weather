@@ -6,6 +6,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:geocoding/geocoding.dart';
+import 'package:timezone/timezone.dart' as tz;
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -21,6 +22,7 @@ class HomePageState extends State<HomePage> {
   String _location = "";
   String _highTemp = "--";
   String _lowTemp = "--";
+  int _timezone = 0;
   TextEditingController _searchController = TextEditingController();
   String upperImage = 'images/Sunny/SUN.png';
   String lowerImage = 'images/Sunny/Trees.png';
@@ -118,17 +120,28 @@ class HomePageState extends State<HomePage> {
       final Map<String, dynamic> data = json.decode(response.body);
       final List<dynamic> hourlyForecasts = data['list'];
 
+      // Extracting the timezone offset in hours
+      final double timezoneOffsetHours = data['city']['timezone']/3600;
+      print(timezoneOffsetHours);
+
       // Extracting the first 6 hours of forecast data
       setState(() {
         _hourlyForecast = hourlyForecasts.where((forecast) {
-          final DateTime forecastTime =
-              DateTime.fromMillisecondsSinceEpoch(forecast['dt'] * 1000);
-          return forecastTime.isBefore(DateTime.now().add(const Duration(hours: 24)));
+          final DateTime forecastTime = DateTime.fromMillisecondsSinceEpoch(
+              forecast['dt'] * 1000,
+              isUtc: true); // Ensure UTC time
+          final DateTime adjustedForecastTime =
+          forecastTime.add(Duration(hours: timezoneOffsetHours.toInt()));
+          return adjustedForecastTime.isBefore(
+              DateTime.now().add(const Duration(hours: 24)));
         }).map((forecast) {
-          final DateTime forecastTime =
-              DateTime.fromMillisecondsSinceEpoch(forecast['dt'] * 1000);
+          final DateTime forecastTime = DateTime.fromMillisecondsSinceEpoch(
+              forecast['dt'] * 1000,
+              isUtc: true); // Ensure UTC time
+          final DateTime adjustedForecastTime =
+          forecastTime.add(Duration(hours: timezoneOffsetHours.toInt()));
           return {
-            'time': forecastTime,
+            'time': adjustedForecastTime,
             'temperature': forecast['main']['temp'].toStringAsFixed(0),
             'weatherIcon': forecast['weather'][0]['icon'],
           };
@@ -156,6 +169,7 @@ class HomePageState extends State<HomePage> {
             .toStringAsFixed(0);
         _lowTemp = double.parse(data['main']['temp_min'].toString())
             .toStringAsFixed(0);
+        _timezone = data['timezone'];
       });
     } else {
       setState(() {
@@ -180,26 +194,26 @@ class HomePageState extends State<HomePage> {
       setState(() {
 
         showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: const Text("Location doesn't exist"),
-              content: const Text("Please enter a valid location."),
-              actions: [
-                Center(
-                  child: SizedBox(
-                    width: 100,
-                    child: TextButton(
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                      child: const Center(child: Text('OK')),
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: const Text("Location doesn't exist"),
+                content: const Text("Please enter a valid location."),
+                actions: [
+                  Center(
+                    child: SizedBox(
+                      width: 100,
+                      child: TextButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                        child: const Center(child: Text('OK')),
+                      ),
                     ),
                   ),
-                ),
-              ],
-            );
-          }
+                ],
+              );
+            }
         );
       });
     }
@@ -404,4 +418,3 @@ class HomePageState extends State<HomePage> {
     );
   }
 }
-
