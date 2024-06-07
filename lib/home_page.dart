@@ -6,7 +6,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:geocoding/geocoding.dart';
-import 'package:timezone/timezone.dart' as tz;
+// import 'package:timezone/timezone.dart' as tz;
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -23,7 +23,7 @@ class HomePageState extends State<HomePage> {
   String _highTemp = "--";
   String _lowTemp = "--";
   int _timezone = 0;
-  TextEditingController _searchController = TextEditingController();
+  final TextEditingController _searchController = TextEditingController();
   String upperImage = 'images/Sunny/SUN.png';
   String lowerImage = 'images/Sunny/Trees.png';
 
@@ -122,7 +122,6 @@ class HomePageState extends State<HomePage> {
 
       // Extracting the timezone offset in hours
       final double timezoneOffsetHours = data['city']['timezone']/3600;
-      print(timezoneOffsetHours);
 
       // Extracting the first 6 hours of forecast data
       setState(() {
@@ -225,7 +224,7 @@ class HomePageState extends State<HomePage> {
         (DateTime.now().toUtc().hour + _timezone / 3600) % 24 > 18;
 
     return Scaffold(
-      backgroundColor: isNight ? Color(0xFF2F3542) : Color(0xFFDCE3EA),
+      backgroundColor: isNight ? const Color(0xFF2F3542) : const Color(0xFFDCE3EA),
       body: GestureDetector(
         onTap: () {
           if (_isDialogVisible) {
