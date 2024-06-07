@@ -16,7 +16,7 @@ class HomePage extends StatefulWidget {
 }
 
 class HomePageState extends State<HomePage> {
-  bool _isDialogVisible = false; // Variable to toggle the dialog box
+  bool _isDialogVisible = false;
   String _weatherDescription = "Loading weather...";
   String _temperature = "--";
   String _location = "";
@@ -221,7 +221,11 @@ class HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    bool isNight = (DateTime.now().toUtc().hour + _timezone / 3600) % 24 < 6 ||
+        (DateTime.now().toUtc().hour + _timezone / 3600) % 24 > 18;
+
     return Scaffold(
+      backgroundColor: isNight ? Color(0xFF2F3542) : Color(0xFFDCE3EA),
       body: GestureDetector(
         onTap: () {
           if (_isDialogVisible) {
@@ -261,19 +265,23 @@ class HomePageState extends State<HomePage> {
                                       borderRadius: BorderRadius.circular(10)),
                                   side: const BorderSide(
                                       width: 1, color: Colors.grey)),
-                              label: const Text(
+                              label: Text(
                                 'My Location',
                                 style: TextStyle(
                                     fontSize: 46,
                                     fontWeight: FontWeight.w500,
-                                    color: Colors.black),
+                                    color:
+                                    isNight ? Colors.white : Colors.black),
                               ),
                             ),
                             Center(
                               child: Text(
                                 _location,
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.bold, fontSize: 24),
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 24,
+                                    color:
+                                    isNight ? Colors.white : Colors.black),
                               ),
                             ),
                             const SizedBox(height: 20),
@@ -302,9 +310,11 @@ class HomePageState extends State<HomePage> {
                                   margin: const EdgeInsets.all(16),
                                   child: Column(
                                     mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    crossAxisAlignment:
+                                    CrossAxisAlignment.center,
                                     children: [
-                                      Text('$_temperature°', style: const TextStyle(fontSize: 80)),
+                                      Text('$_temperature°',
+                                          style: const TextStyle(fontSize: 80)),
                                       Text(_weatherDescription),
                                       Text('H:$_highTemp    L:$_lowTemp'),
                                     ],
@@ -324,8 +334,7 @@ class HomePageState extends State<HomePage> {
                                   ),
                                 ],
                                 color: Colors.white.withOpacity(0.3),
-                                borderRadius:
-                                BorderRadius.circular(20),
+                                borderRadius: BorderRadius.circular(20),
                               ),
                               padding: const EdgeInsets.all(16),
                               margin: const EdgeInsets.all(16),
@@ -386,7 +395,8 @@ class HomePageState extends State<HomePage> {
                           width: 300,
                           decoration: BoxDecoration(
                               color: Colors.white,
-                              border: Border.all(color: Colors.black, width: 1.0),
+                              border:
+                              Border.all(color: Colors.black, width: 1.0),
                               borderRadius: BorderRadius.circular(10)),
                           child: TextField(
                             controller: _searchController,
