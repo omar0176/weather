@@ -6,8 +6,8 @@ import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:geocoding/geocoding.dart';
-import 'package:timezone/timezone.dart' as tz;
 
+// Stateful Widget for the main screen of the app.
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -16,21 +16,193 @@ class HomePage extends StatefulWidget {
 }
 
 class HomePageState extends State<HomePage> {
+  //State variables
+  final String _apiKeyOpenweather = 'ca7125e0df61234bbfddef29c1ababde';
+
   bool _isDialogVisible = false; // Variable to toggle the dialog box
+
   String _weatherDescription = "Loading weather...";
   String _temperature = "--";
   String _location = "";
   String _highTemp = "--";
   String _lowTemp = "--";
   int _timezone = 0;
-  TextEditingController _searchController = TextEditingController();
+
   String upperImage = 'images/Sunny/SUN.png';
   String lowerImage = 'images/Sunny/Trees.png';
 
+  final TextEditingController _searchController = TextEditingController();
+
   List<Map<String, dynamic>> _hourlyForecast = [];
 
-  final String _apiKeyOpenweather = 'ca7125e0df61234bbfddef29c1ababde';
+  // Obtains location of user as soon as the app is opened
+  @override
+  void initState() {
+    super.initState();
+    _getCurrentLocation();
+  }
 
+  // Method to toggle the text box for searching
+  void _toggleTextBox() {
+    setState(() {
+      _isDialogVisible = !_isDialogVisible;
+    });
+  }
+
+  // Method to get the current location as coordinates
+  Future<void> _getCurrentLocation() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    // Check if location services are enabled
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      setState(() {
+        _weatherDescription = "Location services are disabled.";
+      });
+      return;
+    }
+
+    // Check for location permissions
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        setState(() {
+          _weatherDescription = "Location permissions are denied.";
+        });
+        return;
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      setState(() {
+        _weatherDescription = "Location permissions are permanently denied.";
+      });
+      return;
+    }
+
+    // Get current position
+    Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
+
+    _fetchWeather(position.latitude, position.longitude); // Fetch weather for given coordinates
+    _fetchHourlyForecast(position.latitude, position.longitude); // Fetch hourly forecast
+  }
+
+  // Method to fetch weather data from OpenWeather API given appropriate coordinates
+  Future<void> _fetchWeather(double latitude, double longitude) async {
+    final response = await http.get(Uri.parse(
+        'https://api.openweathermap.org/data/2.5/weather?lat=$latitude&lon=$longitude&units=metric&appid=$_apiKeyOpenweather'));
+
+    if (response.statusCode == 200) { // If the response is successful
+      final Map<String, dynamic> data = json.decode(response.body);
+      setState(() {
+        _location = data['name'];
+        _temperature = double.parse(data['main']['temp'].toString()).toStringAsFixed(0);
+        _weatherDescription = data['weather'][0]['description'];
+        _highTemp = double.parse(data['main']['temp_max'].toString())
+            .toStringAsFixed(0);
+        _lowTemp = double.parse(data['main']['temp_min'].toString())
+            .toStringAsFixed(0);
+        _timezone = data['timezone'];
+      });
+    } else { // If the response is unsuccessful
+      setState(() {
+        _weatherDescription = "Failed to fetch weather data.";
+      });
+    }
+  }
+
+  // Method to fetch hourly future forecast data given appropriate coordinates
+  Future<void> _fetchHourlyForecast(double latitude, double longitude) async {
+    final response = await http.get(Uri.parse(
+        'https://api.openweathermap.org/data/2.5/forecast?lat=$latitude&lon=$longitude&units=metric&appid=$_apiKeyOpenweather'));
+
+    if (response.statusCode == 200) { // If the response is successful
+      final Map<String, dynamic> data = json.decode(response.body); // Decode the response's body
+      final List<dynamic> hourlyForecasts = data['list']; // Get the list of hourly forecasts from the response
+      final double timezoneOffsetHours = data['city']['timezone'] / 3600; // Get the timezone offset in hours
+
+      setState(() {
+        final DateTime now = DateTime.now().toUtc(); // Get the current time in UTC
+        final DateTime cutoff = now.add(const Duration(hours: 24)); // Get the time 24 hours from now
+
+        _hourlyForecast = hourlyForecasts.where((forecast) {
+          // Convert forecast time to DateTime and adjust for timezone
+          final DateTime forecastTime = DateTime.fromMillisecondsSinceEpoch(
+              forecast['dt'] * 1000,
+              isUtc: true
+          ).add(Duration(hours: timezoneOffsetHours.toInt()));
+
+          // Filter forecasts to include only those within the next 24 hours
+          return forecastTime.isBefore(cutoff);
+        }).map((forecast) {
+          // Convert forecast time to DateTime and adjust for timezone again for mapping
+          final DateTime forecastTime = DateTime.fromMillisecondsSinceEpoch(
+              forecast['dt'] * 1000,
+              isUtc: true
+          ).add(Duration(hours: timezoneOffsetHours.toInt()));
+
+          // Map each forecast to a desired structure
+          return {
+            'time': forecastTime,
+            'temperature': forecast['main']['temp'].toStringAsFixed(0),
+            'weatherIcon': forecast['weather'][0]['icon'],
+          };
+        }).toList();
+      });
+    } else { // if the response is unsuccessful
+      setState(() {
+        _weatherDescription = "Failed to fetch hourly forecast data.";
+      });
+    }
+  }
+
+  // Method to fetch weather data for an inputted location
+  Future<void> _fetchWeatherForSearch(String location) async {
+    try {
+      List<Location> locations = await locationFromAddress(location); // Get the location from the inputted location
+      if (locations.isNotEmpty) { // If the location exists
+        double latitude = locations[0].latitude;
+        double longitude = locations[0].longitude;
+
+        _fetchWeather(latitude, longitude);
+        _fetchHourlyForecast(latitude, longitude);
+
+        setState(() {
+          _location = location;
+        });
+      }
+    } catch (e) { // If the location doesn't exist
+      setState(() {
+        showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: const Text("Location doesn't exist"),
+                content: const Text("Please enter a valid location."),
+                actions: [
+                  Center(
+                    child: SizedBox(
+                      width: 100,
+                      child: TextButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                        child: const Center(child: Text('OK')),
+                      ),
+                    ),
+                  ),
+                ],
+              );
+            }
+        );
+      });
+    }
+  }
+
+  // Method to get the right weather icon based on icon code
   String getWeatherIcon(String weatherIconCode) {
     switch (weatherIconCode) {
       case '01d': // clear sky (day)
@@ -63,162 +235,7 @@ class HomePageState extends State<HomePage> {
     }
   }
 
-  @override
-  void initState() {
-    super.initState();
-    _getCurrentLocation();
-  }
-
-  void _toggleTextBox() {
-    setState(() {
-      _isDialogVisible = !_isDialogVisible;
-    });
-  }
-
-  Future<void> _getCurrentLocation() async {
-    bool serviceEnabled;
-    LocationPermission permission;
-
-    serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      setState(() {
-        _weatherDescription = "Location services are disabled.";
-      });
-      return;
-    }
-
-    permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        setState(() {
-          _weatherDescription = "Location permissions are denied.";
-        });
-        return;
-      }
-    }
-
-    if (permission == LocationPermission.deniedForever) {
-      setState(() {
-        _weatherDescription = "Location permissions are permanently denied.";
-      });
-      return;
-    }
-
-    Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high);
-
-    _fetchWeather(position.latitude, position.longitude);
-    _fetchHourlyForecast(position.latitude, position.longitude); // Call the _fetchHourlyForecast() method here
-  }
-
-  Future<void> _fetchHourlyForecast(double latitude, double longitude) async {
-    final response = await http.get(Uri.parse(
-        'https://api.openweathermap.org/data/2.5/forecast?lat=$latitude&lon=$longitude&units=metric&appid=$_apiKeyOpenweather'));
-
-    if (response.statusCode == 200) {
-      final Map<String, dynamic> data = json.decode(response.body);
-      final List<dynamic> hourlyForecasts = data['list'];
-
-      // Extracting the timezone offset in hours
-      final double timezoneOffsetHours = data['city']['timezone']/3600;
-      print(timezoneOffsetHours);
-
-      // Extracting the first 6 hours of forecast data
-      setState(() {
-        _hourlyForecast = hourlyForecasts.where((forecast) {
-          final DateTime forecastTime = DateTime.fromMillisecondsSinceEpoch(
-              forecast['dt'] * 1000,
-              isUtc: true); // Ensure UTC time
-          final DateTime adjustedForecastTime =
-          forecastTime.add(Duration(hours: timezoneOffsetHours.toInt()));
-          return adjustedForecastTime.isBefore(
-              DateTime.now().add(const Duration(hours: 24)));
-        }).map((forecast) {
-          final DateTime forecastTime = DateTime.fromMillisecondsSinceEpoch(
-              forecast['dt'] * 1000,
-              isUtc: true); // Ensure UTC time
-          final DateTime adjustedForecastTime =
-          forecastTime.add(Duration(hours: timezoneOffsetHours.toInt()));
-          return {
-            'time': adjustedForecastTime,
-            'temperature': forecast['main']['temp'].toStringAsFixed(0),
-            'weatherIcon': forecast['weather'][0]['icon'],
-          };
-        }).toList();
-      });
-    } else {
-      setState(() {
-        _weatherDescription = "Failed to fetch hourly forecast data.";
-      });
-    }
-  }
-
-  Future<void> _fetchWeather(double latitude, double longitude) async {
-    final response = await http.get(Uri.parse(
-        'https://api.openweathermap.org/data/2.5/weather?lat=$latitude&lon=$longitude&units=metric&appid=$_apiKeyOpenweather'));
-
-    if (response.statusCode == 200) {
-      final Map<String, dynamic> data = json.decode(response.body);
-      setState(() {
-        _location = data['name'];
-        _temperature =
-            double.parse(data['main']['temp'].toString()).toStringAsFixed(0);
-        _weatherDescription = data['weather'][0]['description'];
-        _highTemp = double.parse(data['main']['temp_max'].toString())
-            .toStringAsFixed(0);
-        _lowTemp = double.parse(data['main']['temp_min'].toString())
-            .toStringAsFixed(0);
-        _timezone = data['timezone'];
-      });
-    } else {
-      setState(() {
-        _weatherDescription = "Failed to fetch weather data.";
-      });
-    }
-  }
-
-  Future<void> _fetchWeatherForSearch(String location) async {
-    try {
-      List<Location> locations = await locationFromAddress(location);
-      if (locations.isNotEmpty) {
-        double latitude = locations[0].latitude;
-        double longitude = locations[0].longitude;
-        _fetchWeather(latitude, longitude);
-        _fetchHourlyForecast(latitude, longitude);
-        setState(() {
-          _location = location;
-        });
-      }
-    } catch (e) {
-      setState(() {
-
-        showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return AlertDialog(
-                title: const Text("Location doesn't exist"),
-                content: const Text("Please enter a valid location."),
-                actions: [
-                  Center(
-                    child: SizedBox(
-                      width: 100,
-                      child: TextButton(
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
-                        child: const Center(child: Text('OK')),
-                      ),
-                    ),
-                  ),
-                ],
-              );
-            }
-        );
-      });
-    }
-  }
-
+  // Build method for the UI of the main screen
   @override
   Widget build(BuildContext context) {
     return Scaffold(
