@@ -20,6 +20,10 @@ class HomePageState extends State<HomePage> {
   final String _apiKeyOpenweather = 'ca7125e0df61234bbfddef29c1ababde';
 
   bool _isDialogVisible = false; // Variable to toggle the dialog box
+  bool _isSearchlocation = false; // Variable to check if geolocation is viewed
+  late double _currentLatitude; // Variable to store the current latitude
+  late double _currentLongitude; // Variable to store the current longitude
+
 
   String _weatherDescription = "Loading weather...";
   String _temperature = "--";
@@ -86,10 +90,17 @@ class HomePageState extends State<HomePage> {
     Position position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high);
 
-    _fetchWeather(position.latitude,
-        position.longitude); // Fetch weather for given coordinates
+    _currentLatitude = position.latitude;
+    _currentLongitude = position.longitude;
+
+    _fetchWeather(_currentLatitude,
+        _currentLongitude); // Fetch weather for given coordinates
     _fetchHourlyForecast(
-        position.latitude, position.longitude); // Fetch hourly forecast
+        _currentLatitude, _currentLongitude); // Fetch hourly forecast
+
+    setState(() {
+      _isSearchlocation = false;
+    });
   }
 
   // Method to fetch weather data from OpenWeather API given appropriate coordinates
@@ -186,6 +197,7 @@ class HomePageState extends State<HomePage> {
 
         setState(() {
           _location = location;
+          _isSearchlocation = true;
         });
       }
     } catch (e) {
@@ -216,6 +228,15 @@ class HomePageState extends State<HomePage> {
     }
   }
 
+  void switchToGeolocation() {
+    _fetchWeather(_currentLatitude, _currentLongitude);
+    _fetchHourlyForecast(_currentLatitude, _currentLongitude);
+
+    setState(() {
+      _isSearchlocation = false;
+    });
+  }
+
   // Method to get the right weather icon based on icon code
   String getWeatherIcon(String weatherIconCode) {
     switch (weatherIconCode) {
@@ -228,11 +249,11 @@ class HomePageState extends State<HomePage> {
         lowerImage = 'images/Cloudy/clouds (cloudy).png';
         return 'images/Symbols/cloud.png';
       case '09d' || '09n' || '10d' || '10n': // rain
-        upperImage = 'images/Rain/Rainy cloud.png';
+        upperImage = 'images/Rainy/Rainy cloud.png';
         lowerImage = 'images/Rain/Trees(rainy).png';
         return 'images/Symbols/cloud-drizzle.png';
       case '11d' || '11n': // clear thunderstorm
-        upperImage = 'images/Rain/Rainy cloud.png';
+        upperImage = 'images/Rainy/Rainy cloud.png'; // bug with the image (too much space)
         lowerImage = 'images/Rain/Trees(rainy).png';
         return 'images/Symbols/thunderstorm.png';
       case '13d' || '13n': // snow
@@ -247,6 +268,7 @@ class HomePageState extends State<HomePage> {
         return 'images/Symbols/cloud.png';
     }
   }
+
 
   bool isNight() {
     return (DateTime.now().toUtc().hour + _timezone / 3600) % 24 < 6 ||
@@ -287,26 +309,43 @@ class HomePageState extends State<HomePage> {
                         child: Column(
                           children: [
                             const SizedBox(height: 20),
-                            OutlinedButton.icon(
-                              onPressed: _toggleTextBox,
-                              icon: const Icon(
-                                Icons.search,
-                                color: Colors.black,
-                              ),
-                              style: OutlinedButton.styleFrom(
-                                  shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(10)),
-                                  side: const BorderSide(
-                                      width: 1, color: Colors.grey)),
-                              label: Text(
-                                'My Location',
-                                style: TextStyle(
-                                    fontSize: 46,
-                                    fontWeight: FontWeight.w500,
-                                    color: isNight()
-                                        ? Colors.white
-                                        : Colors.black),
-                              ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                OutlinedButton.icon(
+                                  onPressed: _toggleTextBox,
+                                  icon: const Icon(
+                                    Icons.search,
+                                    color: Colors.black,
+                                  ),
+                                  style: OutlinedButton.styleFrom(
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    side: const BorderSide(
+                                      width: 1,
+                                      color: Colors.grey,
+                                    ),
+                                  ),
+                                  label: Text(
+                                    'My Location',
+                                    style: TextStyle(
+                                      fontSize: 46,
+                                      fontWeight: FontWeight.w500,
+                                      color: isNight() ? Colors.white : Colors.black,
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(width: 10), // Add some space between the buttons
+                                if (_isSearchlocation) // slow asf
+                                  FloatingActionButton.small(
+                                    child: const Icon(Icons.refresh),
+                                    onPressed: () {
+                                      switchToGeolocation();
+                                    },
+                                    backgroundColor: Color(0xFFDCE3EA),
+                                  ),
+                              ],
                             ),
                             Center(
                               child: Text(
