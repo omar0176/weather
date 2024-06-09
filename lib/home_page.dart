@@ -234,10 +234,15 @@ class HomePageState extends State<HomePage> {
         return 'images/Symbols/cloud.png';
     }
   }
-
+  bool isNight() {
+    return (DateTime.now().toUtc().hour + _timezone / 3600) % 24 < 6 ||
+        (DateTime.now().toUtc().hour + _timezone / 3600) % 24 > 18;
+  }
+  
   // Build method for the UI of the main screen
   @override
   Widget build(BuildContext context) {
+    backgroundColor: isNight() ? const Color(0xFF2F3542) : const Color(0xFFDCE3EA),
     return Scaffold(
       body: GestureDetector(
         onTap: () {
@@ -283,14 +288,18 @@ class HomePageState extends State<HomePage> {
                                 style: TextStyle(
                                     fontSize: 46,
                                     fontWeight: FontWeight.w500,
-                                    color: Colors.black),
+                                    color: isNight() ? Colors.white : Colors.black),
+                                
+
                               ),
                             ),
                             Center(
                               child: Text(
                                 _location,
                                 style: const TextStyle(
-                                    fontWeight: FontWeight.bold, fontSize: 24),
+                                    fontWeight: FontWeight.bold, 
+                                    fontSize: 24,
+                                    color: isNight() ? Colors.white : Colors.black),
                               ),
                             ),
                             const SizedBox(height: 20),
