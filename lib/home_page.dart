@@ -86,8 +86,10 @@ class HomePageState extends State<HomePage> {
     Position position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high);
 
-    _fetchWeather(position.latitude, position.longitude); // Fetch weather for given coordinates
-    _fetchHourlyForecast(position.latitude, position.longitude); // Fetch hourly forecast
+    _fetchWeather(position.latitude,
+        position.longitude); // Fetch weather for given coordinates
+    _fetchHourlyForecast(
+        position.latitude, position.longitude); // Fetch hourly forecast
   }
 
   // Method to fetch weather data from OpenWeather API given appropriate coordinates
@@ -95,11 +97,13 @@ class HomePageState extends State<HomePage> {
     final response = await http.get(Uri.parse(
         'https://api.openweathermap.org/data/2.5/weather?lat=$latitude&lon=$longitude&units=metric&appid=$_apiKeyOpenweather'));
 
-    if (response.statusCode == 200) { // If the response is successful
+    if (response.statusCode == 200) {
+      // If the response is successful
       final Map<String, dynamic> data = json.decode(response.body);
       setState(() {
         _location = data['name'];
-        _temperature = double.parse(data['main']['temp'].toString()).toStringAsFixed(0);
+        _temperature =
+            double.parse(data['main']['temp'].toString()).toStringAsFixed(0);
         _weatherDescription = data['weather'][0]['description'];
         _highTemp = double.parse(data['main']['temp_max'].toString())
             .toStringAsFixed(0);
@@ -107,7 +111,8 @@ class HomePageState extends State<HomePage> {
             .toStringAsFixed(0);
         _timezone = data['timezone'];
       });
-    } else { // If the response is unsuccessful
+    } else {
+      // If the response is unsuccessful
       setState(() {
         _weatherDescription = "Failed to fetch weather data.";
       });
@@ -119,30 +124,36 @@ class HomePageState extends State<HomePage> {
     final response = await http.get(Uri.parse(
         'https://api.openweathermap.org/data/2.5/forecast?lat=$latitude&lon=$longitude&units=metric&appid=$_apiKeyOpenweather'));
 
-    if (response.statusCode == 200) { // If the response is successful
-      final Map<String, dynamic> data = json.decode(response.body); // Decode the response's body
-      final List<dynamic> hourlyForecasts = data['list']; // Get the list of hourly forecasts from the response
-      final double timezoneOffsetHours = data['city']['timezone'] / 3600; // Get the timezone offset in hours
+    if (response.statusCode == 200) {
+      // If the response is successful
+      final Map<String, dynamic> data =
+          json.decode(response.body); // Decode the response's body
+      final List<dynamic> hourlyForecasts =
+          data['list']; // Get the list of hourly forecasts from the response
+      final double timezoneOffsetHours =
+          data['city']['timezone'] / 3600; // Get the timezone offset in hours
 
       setState(() {
-        final DateTime now = DateTime.now().toUtc(); // Get the current time in UTC
-        final DateTime cutoff = now.add(const Duration(hours: 24)); // Get the time 24 hours from now
+        final DateTime now =
+            DateTime.now().toUtc(); // Get the current time in UTC
+        final DateTime cutoff = now
+            .add(const Duration(hours: 24)); // Get the time 24 hours from now
 
         _hourlyForecast = hourlyForecasts.where((forecast) {
           // Convert forecast time to DateTime and adjust for timezone
           final DateTime forecastTime = DateTime.fromMillisecondsSinceEpoch(
-              forecast['dt'] * 1000,
-              isUtc: true
-          ).add(Duration(hours: timezoneOffsetHours.toInt()));
+                  forecast['dt'] * 1000,
+                  isUtc: true)
+              .add(Duration(hours: timezoneOffsetHours.toInt()));
 
           // Filter forecasts to include only those within the next 24 hours
           return forecastTime.isBefore(cutoff);
         }).map((forecast) {
           // Convert forecast time to DateTime and adjust for timezone again for mapping
           final DateTime forecastTime = DateTime.fromMillisecondsSinceEpoch(
-              forecast['dt'] * 1000,
-              isUtc: true
-          ).add(Duration(hours: timezoneOffsetHours.toInt()));
+                  forecast['dt'] * 1000,
+                  isUtc: true)
+              .add(Duration(hours: timezoneOffsetHours.toInt()));
 
           // Map each forecast to a desired structure
           return {
@@ -152,7 +163,8 @@ class HomePageState extends State<HomePage> {
           };
         }).toList();
       });
-    } else { // if the response is unsuccessful
+    } else {
+      // if the response is unsuccessful
       setState(() {
         _weatherDescription = "Failed to fetch hourly forecast data.";
       });
@@ -162,8 +174,10 @@ class HomePageState extends State<HomePage> {
   // Method to fetch weather data for an inputted location
   Future<void> _fetchWeatherForSearch(String location) async {
     try {
-      List<Location> locations = await locationFromAddress(location); // Get the location from the inputted location
-      if (locations.isNotEmpty) { // If the location exists
+      List<Location> locations = await locationFromAddress(
+          location); // Get the location from the inputted location
+      if (locations.isNotEmpty) {
+        // If the location exists
         double latitude = locations[0].latitude;
         double longitude = locations[0].longitude;
 
@@ -174,7 +188,8 @@ class HomePageState extends State<HomePage> {
           _location = location;
         });
       }
-    } catch (e) { // If the location doesn't exist
+    } catch (e) {
+      // If the location doesn't exist
       setState(() {
         showDialog(
             context: context,
@@ -196,8 +211,7 @@ class HomePageState extends State<HomePage> {
                   ),
                 ],
               );
-            }
-        );
+            });
       });
     }
   }
@@ -230,20 +244,21 @@ class HomePageState extends State<HomePage> {
         lowerImage = 'images/Night/clouds (night).png';
         return 'images/Symbols/Moon-logo.png'; // clear sky (night)
       default:
-
         return 'images/Symbols/cloud.png';
     }
   }
+
   bool isNight() {
     return (DateTime.now().toUtc().hour + _timezone / 3600) % 24 < 6 ||
         (DateTime.now().toUtc().hour + _timezone / 3600) % 24 > 18;
   }
-  
+
   // Build method for the UI of the main screen
   @override
   Widget build(BuildContext context) {
-    backgroundColor: isNight() ? const Color(0xFF2F3542) : const Color(0xFFDCE3EA),
     return Scaffold(
+      backgroundColor:
+          isNight() ? const Color(0xFF2F3542) : const Color(0xFFDCE3EA),
       body: GestureDetector(
         onTap: () {
           if (_isDialogVisible) {
@@ -283,23 +298,25 @@ class HomePageState extends State<HomePage> {
                                       borderRadius: BorderRadius.circular(10)),
                                   side: const BorderSide(
                                       width: 1, color: Colors.grey)),
-                              label: const Text(
+                              label: Text(
                                 'My Location',
                                 style: TextStyle(
                                     fontSize: 46,
                                     fontWeight: FontWeight.w500,
-                                    color: isNight() ? Colors.white : Colors.black),
-                                
-
+                                    color: isNight()
+                                        ? Colors.white
+                                        : Colors.black),
                               ),
                             ),
                             Center(
                               child: Text(
                                 _location,
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.bold, 
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold,
                                     fontSize: 24,
-                                    color: isNight() ? Colors.white : Colors.black),
+                                    color: isNight()
+                                        ? Colors.white
+                                        : Colors.black),
                               ),
                             ),
                             const SizedBox(height: 20),
@@ -328,9 +345,11 @@ class HomePageState extends State<HomePage> {
                                   margin: const EdgeInsets.all(16),
                                   child: Column(
                                     mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
                                     children: [
-                                      Text('$_temperature°', style: const TextStyle(fontSize: 80)),
+                                      Text('$_temperature°',
+                                          style: const TextStyle(fontSize: 80)),
                                       Text(_weatherDescription),
                                       Text('H:$_highTemp    L:$_lowTemp'),
                                     ],
@@ -350,8 +369,7 @@ class HomePageState extends State<HomePage> {
                                   ),
                                 ],
                                 color: Colors.white.withOpacity(0.3),
-                                borderRadius:
-                                BorderRadius.circular(20),
+                                borderRadius: BorderRadius.circular(20),
                               ),
                               padding: const EdgeInsets.all(16),
                               margin: const EdgeInsets.all(16),
@@ -412,7 +430,8 @@ class HomePageState extends State<HomePage> {
                           width: 300,
                           decoration: BoxDecoration(
                               color: Colors.white,
-                              border: Border.all(color: Colors.black, width: 1.0),
+                              border:
+                                  Border.all(color: Colors.black, width: 1.0),
                               borderRadius: BorderRadius.circular(10)),
                           child: TextField(
                             controller: _searchController,
