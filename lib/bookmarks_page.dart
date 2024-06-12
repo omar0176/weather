@@ -261,7 +261,7 @@ class BookmarksPageState extends State<BookmarksPage> {
                     subtitle: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text('Country: ${bookmark.country}'), // Use bookmark.country instead of _country
+                        Text(bookmark.country), // Use bookmark.country instead of _country
                         Text(
                             'L:${bookmark.lowTemp}°  H:${bookmark.highTemp}°'), // Use bookmark.lowTemp and bookmark.highTemp
                       ],
