@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:ffi';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -260,15 +259,15 @@ class HomePageState extends State<HomePage> {
     if (weatherId >= 200 && weatherId <= 232) {
       // Thunderstorm
       upperImage = 'images/Rainy/Rainy cloud.png';
-      lowerImage = 'images/Rain/Trees(rainy).png';
+      lowerImage = 'images/Rainy/Trees(rainy).png';
     } else if (weatherId >= 300 && weatherId <= 321) {
       // Drizzle
       upperImage = 'images/Rainy/Rainy cloud.png';
-      lowerImage = 'images/Rain/Trees(rainy).png';
+      lowerImage = 'images/Rainy/Trees(rainy).png';
     } else if (weatherId >= 500 && weatherId <= 531) {
       // Rain
       upperImage = 'images/Rainy/Rainy cloud.png';
-      lowerImage = 'images/Rain/Trees(rainy).png';
+      lowerImage = 'images/Rainy/Trees(rainy).png';
     } else if (weatherId >= 600 && weatherId <= 622) {
       // Snow
       upperImage = 'images/Snowy/snow cloud.png';
@@ -374,7 +373,7 @@ class HomePageState extends State<HomePage> {
                                     ),
                                   ),
                                   label: Text(
-                                    'My Location',
+                                    'Location',
                                     style: TextStyle(
                                       fontSize: 46,
                                       fontWeight: FontWeight.w500,
