@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:ffi';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -24,13 +25,14 @@ class HomePageState extends State<HomePage> {
   late double _currentLatitude; // Variable to store the current latitude
   late double _currentLongitude; // Variable to store the current longitude
 
-
   String _weatherDescription = "Loading weather...";
   String _temperature = "--";
   String _location = "";
   String _highTemp = "--";
   String _lowTemp = "--";
   int _timezone = 0;
+  int _weatherCondition = 0;
+  String _weatherConditionIcon = '';
 
   String upperImage = 'images/Sunny/SUN.png';
   String lowerImage = 'images/Sunny/Trees.png';
@@ -121,6 +123,8 @@ class HomePageState extends State<HomePage> {
         _lowTemp = double.parse(data['main']['temp_min'].toString())
             .toStringAsFixed(0);
         _timezone = data['timezone'];
+        _weatherConditionIcon = data['weather'][0]['icon'];
+        _weatherCondition = data['weather'][0]['id'];
       });
     } else {
       // If the response is unsuccessful
@@ -185,21 +189,34 @@ class HomePageState extends State<HomePage> {
   // Method to fetch weather data for an inputted location
   Future<void> _fetchWeatherForSearch(String location) async {
     try {
-      List<Location> locations = await locationFromAddress(
-          location); // Get the location from the inputted location
+      List<Location> locations = await locationFromAddress(location);
       if (locations.isNotEmpty) {
-        // If the location exists
         double latitude = locations[0].latitude;
         double longitude = locations[0].longitude;
 
-        _fetchWeather(latitude, longitude);
-        _fetchHourlyForecast(latitude, longitude);
+        final response = await http.get(Uri.parse(
+            'https://api.openweathermap.org/data/2.5/weather?lat=$latitude&lon=$longitude&units=metric&appid=$_apiKeyOpenweather'));
 
-        setState(() {
-          _location = location;
-          _isSearchlocation = true;
-        });
-      }
+        if (response.statusCode == 200) {
+          final Map<String, dynamic> data = json.decode(response.body);
+          int weatherId = data['weather'][0]['id'];
+          String weatherIconCode = data['weather'][0]['icon'];
+
+          // Call getWeatcherCondtion function and update the state
+          setState(() {
+            upperImage = getWeatcherCondtion(weatherId, weatherIconCode, 1);
+            lowerImage = getWeatcherCondtion(weatherId, weatherIconCode, 0);
+          });
+
+          _fetchWeather(latitude, longitude);
+          _fetchHourlyForecast(latitude, longitude);
+
+          setState(() {
+            _location = location;
+            _isSearchlocation = true;
+          });
+        }
+  }
     } catch (e) {
       // If the location doesn't exist
       setState(() {
@@ -237,32 +254,61 @@ class HomePageState extends State<HomePage> {
     });
   }
 
+  String getWeatcherCondtion(
+      int weatherId, String weatherIconCode, int upperOrLower) {
+    // 1 is upper and 0 is lower
+    if (weatherId >= 200 && weatherId <= 232) {
+      // Thunderstorm
+      upperImage = 'images/Rainy/Rainy cloud.png';
+      lowerImage = 'images/Rain/Trees(rainy).png';
+    } else if (weatherId >= 300 && weatherId <= 321) {
+      // Drizzle
+      upperImage = 'images/Rainy/Rainy cloud.png';
+      lowerImage = 'images/Rain/Trees(rainy).png';
+    } else if (weatherId >= 500 && weatherId <= 531) {
+      // Rain
+      upperImage = 'images/Rainy/Rainy cloud.png';
+      lowerImage = 'images/Rain/Trees(rainy).png';
+    } else if (weatherId >= 600 && weatherId <= 622) {
+      // Snow
+      upperImage = 'images/Snowy/snow cloud.png';
+      lowerImage = 'images/Snowy/snow mountains.png';
+    } else if (weatherId >= 701 && weatherId <= 781) {
+      // Atmosphere
+      upperImage = 'images/Cloudy/sun cloudy.png';
+      lowerImage = 'images/Cloudy/clouds (cloudy).png';
+    } else if (weatherId == 800) {
+      if (weatherIconCode == '01d') {
+        // Clear sky (day)
+        upperImage = 'images/Sunny/SUN.png';
+        lowerImage = 'images/Sunny/Trees.png';
+      } else if (weatherIconCode == '01n') {
+        // Clear sky (night)
+        upperImage = 'images/Night/Moon.png';
+        lowerImage = 'images/Night/clouds (night).png';
+      }
+    } else if (weatherId >= 801 && weatherId <= 804) {
+      // Clouds
+      upperImage = 'images/Cloudy/sun cloudy.png';
+      lowerImage = 'images/Cloudy/clouds (cloudy).png';
+    }
+    return upperOrLower == 1 ? upperImage : lowerImage;
+  }
+
   // Method to get the right weather icon based on icon code
   String getWeatherIcon(String weatherIconCode) {
     switch (weatherIconCode) {
       case '01d': // clear sky (day)
-        upperImage = 'images/Sunny/SUN.png';
-        lowerImage = 'images/Sunny/Trees.png';
         return 'images/Symbols/sun logo.png';
       case '02d' || '02n' || '03d' || '03n' || '04d' || '04n': // Cloudy
-        upperImage = 'images/Cloudy/sun cloudy.png';
-        lowerImage = 'images/Cloudy/clouds (cloudy).png';
         return 'images/Symbols/cloud.png';
       case '09d' || '09n' || '10d' || '10n': // rain
-        upperImage = 'images/Rainy/Rainy cloud.png';
-        lowerImage = 'images/Rain/Trees(rainy).png';
         return 'images/Symbols/cloud-drizzle.png';
       case '11d' || '11n': // clear thunderstorm
-        upperImage = 'images/Rainy/Rainy cloud.png'; // bug with the image (too much space)
-        lowerImage = 'images/Rain/Trees(rainy).png';
         return 'images/Symbols/thunderstorm.png';
       case '13d' || '13n': // snow
-        upperImage = 'images/Snow/snow cloud.png';
-        lowerImage = 'images/Snow/snow mountains.png';
         return 'images/Symbols/snow.png';
       case '01n':
-        upperImage = 'images/Night/Moon.png';
-        lowerImage = 'images/Night/clouds (night).png';
         return 'images/Symbols/Moon-logo.png'; // clear sky (night)
       default:
         return 'images/Symbols/cloud.png';
@@ -299,7 +345,7 @@ class HomePageState extends State<HomePage> {
                     child: Container(
                       decoration: BoxDecoration(
                         image: DecorationImage(
-                          image: AssetImage(lowerImage),
+                          image: AssetImage(getWeatcherCondtion(_weatherCondition, _weatherConditionIcon, 0)),
                           fit: BoxFit.fitWidth,
                           alignment: Alignment.bottomCenter,
                         ),
@@ -336,14 +382,14 @@ class HomePageState extends State<HomePage> {
                                     ),
                                   ),
                                 ),
-                                SizedBox(width: 10), // Add some space between the buttons
+                                const SizedBox(width: 10), // Add some space between the buttons
                                 if (_isSearchlocation) // slow asf
                                   FloatingActionButton.small(
-                                    child: const Icon(Icons.refresh),
                                     onPressed: () {
                                       switchToGeolocation();
                                     },
-                                    backgroundColor: Color(0xFFDCE3EA),
+                                    backgroundColor: const Color(0xFFDCE3EA),
+                                    child: const Icon(Icons.refresh),
                                   ),
                               ],
                             ),
@@ -364,7 +410,7 @@ class HomePageState extends State<HomePage> {
                               crossAxisAlignment: CrossAxisAlignment.center,
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Image.asset(upperImage),
+                                Image.asset(getWeatcherCondtion(_weatherCondition, _weatherConditionIcon, 1)),
                                 const SizedBox(height: 10),
                                 Container(
                                   decoration: BoxDecoration(
