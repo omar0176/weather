@@ -534,6 +534,7 @@ class HomePageState extends State<HomePage> {
                             onSubmitted: (value) {
                               _fetchWeatherForSearch(value);
                               _toggleTextBox();
+
                             },
                           ),
                         ),
