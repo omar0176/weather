@@ -147,11 +147,9 @@ class HomePageState extends State<HomePage> {
       final double timezoneOffsetHours =
           data['city']['timezone'] / 3600; // Get the timezone offset in hours
 
-      setState(() {
-        final DateTime now =
-            DateTime.now().toUtc(); // Get the current time in UTC
-        final DateTime cutoff = now
-            .add(const Duration(hours: 24)); // Get the time 24 hours from now
+    setState(() {
+      final DateTime now = DateTime.now().toUtc().add(Duration(hours: timezoneOffsetHours.toInt())); // Adjust for timezone
+      final DateTime cutoff = now.add(const Duration(hours: 24)); // Get the time 24 hours from now
 
         _hourlyForecast = hourlyForecasts.where((forecast) {
           // Convert forecast time to DateTime and adjust for timezone
@@ -373,7 +371,7 @@ class HomePageState extends State<HomePage> {
                                     ),
                                   ),
                                   label: Text(
-                                    'Location',
+                                    'My Location',
                                     style: TextStyle(
                                       fontSize: 46,
                                       fontWeight: FontWeight.w500,
