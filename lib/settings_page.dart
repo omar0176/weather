@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
+
+final Uri _url = Uri.parse('https://www.mercedes-benz-berlin.de/passengercars/startpage.html'); // URL to open
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
@@ -50,6 +53,7 @@ class SettingsPage extends StatelessWidget {
               subtitle: const Text('Find out more on the web!'),
               onTap: () {
                 // Open website homepage
+              _launchUrl();
               },
             ),
             const ListTile(
@@ -62,4 +66,11 @@ class SettingsPage extends StatelessWidget {
       ),
     );
   }
+  Future<void> _launchUrl() async {
+    if (!await launchUrl(_url)) {
+      throw Exception('Could not launch $_url');
+    }
+  }
 }
+
+

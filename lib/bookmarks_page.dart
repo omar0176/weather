@@ -35,12 +35,19 @@ class BookmarksPageState extends State<BookmarksPage> {
   final List<Bookmark> _bookmarks = [];
 
   bool _isDialogVisible = false; // Variable to toggle the dialog box
+
+  // Controller for the search text box
+  final TextEditingController _searchController = TextEditingController();
+
+  //Focus mode variable
+  final FocusNode _searchFocusNode = FocusNode();
+
+  // Variables to store weather data
   String _temperature = "--";
   String _location = "";
   String _country = "";
   String _highTemp = "--";
   String _lowTemp = "--";
-  final TextEditingController _searchController = TextEditingController();
 
   // Initializes state and fetches current location + loads bookmarks
   @override
@@ -53,6 +60,10 @@ class BookmarksPageState extends State<BookmarksPage> {
   void _toggleTextBox() {
     setState(() {
       _isDialogVisible = !_isDialogVisible;
+      if (_isDialogVisible) {
+        _searchController.clear();
+        _searchFocusNode.requestFocus();
+      }
     });
   }
 
@@ -86,8 +97,10 @@ class BookmarksPageState extends State<BookmarksPage> {
 // Method to fetch weather data for an inputted location
   Future<void> _fetchWeatherForSearch(String location) async {
     try {
-      List<Location> locations = await locationFromAddress(location); // Get the location from the inputted location
-      if (locations.isNotEmpty) { // If the location exists
+      List<Location> locations = await locationFromAddress(
+          location); // Get the location from the inputted location
+      if (locations.isNotEmpty) {
+        // If the location exists
         double latitude = locations[0].latitude;
         double longitude = locations[0].longitude;
 
@@ -97,7 +110,8 @@ class BookmarksPageState extends State<BookmarksPage> {
           _location = location;
         });
       }
-    } catch (e) { // If the location doesn't exist
+    } catch (e) {
+      // If the location doesn't exist
       setState(() {
         showDialog(
             context: context,
@@ -119,8 +133,7 @@ class BookmarksPageState extends State<BookmarksPage> {
                   ),
                 ],
               );
-            }
-        );
+            });
       });
     }
   }
@@ -147,7 +160,8 @@ class BookmarksPageState extends State<BookmarksPage> {
   }
 
 // Modify a bookmark or add a new one
-  void _modifyBookmark(String location, String country, String temperature, String highTemp, String lowTemp) {
+  void _modifyBookmark(String location, String country, String temperature,
+      String highTemp, String lowTemp) {
     setState(() {
       // Check if the _bookmarks list has fewer than 20 bookmarks
       if (_bookmarks.length < 20) {
@@ -159,7 +173,8 @@ class BookmarksPageState extends State<BookmarksPage> {
             builder: (BuildContext context) {
               return AlertDialog(
                 title: const Text('Duplicate Bookmark'),
-                content: const Text('A bookmark with this location already exists.'),
+                content:
+                    const Text('A bookmark with this location already exists.'),
                 actions: <Widget>[
                   Center(
                     child: SizedBox(
@@ -220,7 +235,6 @@ class BookmarksPageState extends State<BookmarksPage> {
     });
   }
 
-
 // Build the bookmarks page UI
   @override
   Widget build(BuildContext context) {
@@ -229,126 +243,150 @@ class BookmarksPageState extends State<BookmarksPage> {
         children: [
           Padding(
             padding: const EdgeInsets.all(5.0),
-            child: ListView.builder(
-              itemCount: _bookmarks.length,
-              itemBuilder: (context, index) {
-                final bookmark = _bookmarks[index];
-                return Container(
-                  decoration: BoxDecoration(
-                    boxShadow: const [
-                      BoxShadow(
-                        color: Color(0xFFB2E4FA),
-                        offset: Offset(0, 4),
-                        blurRadius: 1,
-                        spreadRadius: 0,
-                      ),
-                    ],
-                    color: Colors.white.withOpacity(0.3),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  padding: const EdgeInsets.all(5),
-                  margin: const EdgeInsets.all(3),
-                  child: ListTile(
-                    title: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(bookmark
-                            .location), // Use bookmark.location instead of _location
-                        Text(
-                            '${bookmark.temperature}°'), // Use bookmark.temperature instead of _temperature
-                      ],
-                    ),
-                    subtitle: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(bookmark.country), // Use bookmark.country instead of _country
-                        Text(
-                            'L:${bookmark.lowTemp}°  H:${bookmark.highTemp}°'), // Use bookmark.lowTemp and bookmark.highTemp
-                      ],
-                    ),
-                    onLongPress: () {
-                      showDialog(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return AlertDialog(
-                            title: const Text('Delete Bookmark'),
-                            content: const Text(
-                              'Are you sure you want to delete this bookmark?',
-                              style: TextStyle(fontSize: 16),
+            child: _bookmarks.isEmpty // Text to display if there are no bookmarks
+                ? const Center(
+                    child: Text(
+                        'You can add bookmarks by \n  clicking the button on the \n     bottom right corner.',
+                    style: TextStyle(
+                      color: Colors.black,
+                    ),),
+                  )
+                : ListView.builder(
+                    itemCount: _bookmarks.length,
+                    itemBuilder: (context, index) {
+                      final bookmark = _bookmarks[index];
+                      return Container(
+                        decoration: BoxDecoration(
+                          boxShadow: const [
+                            BoxShadow(
+                              color: Color(0xFFB2E4FA),
+                              offset: Offset(0, 4),
+                              blurRadius: 1,
+                              spreadRadius: 0,
                             ),
-                            actions: <Widget>[
-                              TextButton(
-                                child: const Text(
-                                  'Cancel',
-                                  style: TextStyle(color: Colors.black),
-                                ),
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                },
-                              ),
-                              TextButton(
-                                child: const Text(
-                                  'Delete',
-                                  style: TextStyle(color: Colors.red),
-                                ),
-                                onPressed: () {
-                                  _deleteBookmark(
-                                      index); // Call a method to delete the bookmark
-                                  Navigator.of(context).pop();
-                                },
-                              ),
+                          ],
+                          color: Colors.white.withOpacity(0.3),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        padding: const EdgeInsets.all(5),
+                        margin: const EdgeInsets.all(3),
+                        child: ListTile(
+                          title: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(bookmark
+                                  .location), // Use bookmark.location instead of _location
+                              Text(
+                                  '${bookmark.temperature}°'), // Use bookmark.temperature instead of _temperature
                             ],
-                          );
-                        },
+                          ),
+                          subtitle: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(bookmark
+                                  .country), // Use bookmark.country instead of _country
+                              Text(
+                                  'L:${bookmark.lowTemp}°  H:${bookmark.highTemp}°'), // Use bookmark.lowTemp and bookmark.highTemp
+                            ],
+                          ),
+                          onLongPress: () {
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  title: const Text('Delete Bookmark'),
+                                  content: const Text(
+                                    'Are you sure you want to delete this bookmark?',
+                                    style: TextStyle(fontSize: 16),
+                                  ),
+                                  actions: <Widget>[
+                                    TextButton(
+                                      child: const Text(
+                                        'Cancel',
+                                        style: TextStyle(color: Colors.black),
+                                      ),
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                      },
+                                    ),
+                                    TextButton(
+                                      child: const Text(
+                                        'Delete',
+                                        style: TextStyle(color: Colors.red),
+                                      ),
+                                      onPressed: () {
+                                        _deleteBookmark(
+                                            index); // Call a method to delete the bookmark
+                                        Navigator.of(context).pop();
+                                      },
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+                          },
+                        ),
                       );
                     },
                   ),
-                );
-              },
-            ),
           ),
           if (_isDialogVisible)
-            BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+            GestureDetector(
+              // to close the text box when tapped away
+              onTap: () {
+                FocusScopeNode currentFocus = FocusScope.of(context);
+                if (!currentFocus.hasPrimaryFocus) {
+                  currentFocus.unfocus();
+                  _toggleTextBox();
+                }
+              },
               child: Container(
-                color: Colors.black.withOpacity(0.5),
-                child: Center(
-                  child: Column(
-                    children: [
-                      const SizedBox(height: 40),
-                      Container(
-                        height: 50,
-                        width: 300,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          border: Border.all(color: Colors.black, width: 1.0),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: TextField(
-                          controller: _searchController,
-                          inputFormatters: [
-                            FilteringTextInputFormatter.allow(
-                              RegExp(r'[a-zA-Z,\s]'),
+                color: Colors.transparent,
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+                  child: Container(
+                    color: Colors.black.withOpacity(0.5),
+                    child: Center(
+                      child: Column(
+                        children: [
+                          const SizedBox(height: 40),
+                          Container(
+                            height: 50,
+                            width: 300,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              border:
+                                  Border.all(color: Colors.black, width: 1.0),
+                              borderRadius: BorderRadius.circular(10),
                             ),
-                          ],
-                          decoration: const InputDecoration(
-                            hintText: 'Berlin, Germany',
-                            prefixIcon: Icon(Icons.search),
-                            border: InputBorder.none,
-                            contentPadding: EdgeInsets.symmetric(
-                              vertical: 12.0,
-                              horizontal: 12.0,
+                            child: TextField(
+                              focusNode: _searchFocusNode,
+                              controller: _searchController,
+                              inputFormatters: [
+                                FilteringTextInputFormatter.allow(
+                                  RegExp(r'[a-zA-Z,\s]'),
+                                ),
+                              ],
+                              decoration: const InputDecoration(
+                                hintText: 'Berlin, Germany',
+                                prefixIcon: Icon(Icons.search),
+                                border: InputBorder.none,
+                                contentPadding: EdgeInsets.symmetric(
+                                  vertical: 12.0,
+                                  horizontal: 12.0,
+                                ),
+                              ),
+                              onSubmitted: (value) {
+                                if (value.isNotEmpty) {
+                                  _fetchWeatherForSearch(value);
+                                  _toggleTextBox();
+                                }
+                              },
                             ),
                           ),
-                          onSubmitted: (value) {
-                            if (value.isNotEmpty) {
-                              _fetchWeatherForSearch(value);
-                              _toggleTextBox();
-                            }
-                          },
-                        ),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
                 ),
               ),

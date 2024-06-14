@@ -24,20 +24,29 @@ class HomePageState extends State<HomePage> {
   late double _currentLatitude; // Variable to store the current latitude
   late double _currentLongitude; // Variable to store the current longitude
 
+
+  // Variables to store weather data on the screen
   String _weatherDescription = "Loading weather...";
   String _temperature = "--";
   String _location = "";
   String _highTemp = "--";
   String _lowTemp = "--";
+
+  // Variables for functionality
   int _timezone = 0;
   int _weatherCondition = 0;
   String _weatherConditionIcon = '';
 
+  // Variables to store images
   String upperImage = 'images/Sunny/SUN.png';
   String lowerImage = 'images/Sunny/Trees.png';
 
+  // Controller for the search text box
   final TextEditingController _searchController = TextEditingController();
 
+  final FocusNode _searchFocusNode = FocusNode();
+
+  // List to store hourly forecast data
   List<Map<String, dynamic>> _hourlyForecast = [];
 
   // Obtains location of user as soon as the app is opened
@@ -51,6 +60,10 @@ class HomePageState extends State<HomePage> {
   void _toggleTextBox() {
     setState(() {
       _isDialogVisible = !_isDialogVisible;
+      if(_isDialogVisible){
+        _searchController.clear();
+        _searchFocusNode.requestFocus();
+      }
     });
   }
 
@@ -199,10 +212,10 @@ class HomePageState extends State<HomePage> {
           int weatherId = data['weather'][0]['id'];
           String weatherIconCode = data['weather'][0]['icon'];
 
-          // Call getWeatcherCondtion function and update the state
+          // Call getWeatherCondition function and update the state
           setState(() {
-            upperImage = getWeatcherCondtion(weatherId, weatherIconCode, 1);
-            lowerImage = getWeatcherCondtion(weatherId, weatherIconCode, 0);
+            upperImage = getWeatherCondition(weatherId, weatherIconCode, 1);
+            lowerImage = getWeatherCondition(weatherId, weatherIconCode, 0);
           });
 
           _fetchWeather(latitude, longitude);
@@ -251,7 +264,7 @@ class HomePageState extends State<HomePage> {
     });
   }
 
-  String getWeatcherCondtion(
+  String getWeatherCondition(
       int weatherId, String weatherIconCode, int upperOrLower) {
     // 1 is upper and 0 is lower
     if (weatherId >= 200 && weatherId <= 232) {
@@ -342,7 +355,7 @@ class HomePageState extends State<HomePage> {
                     child: Container(
                       decoration: BoxDecoration(
                         image: DecorationImage(
-                          image: AssetImage(getWeatcherCondtion(_weatherCondition, _weatherConditionIcon, 0)),
+                          image: AssetImage(getWeatherCondition(_weatherCondition, _weatherConditionIcon, 0)),
                           fit: BoxFit.fitWidth,
                           alignment: Alignment.bottomCenter,
                         ),
@@ -407,7 +420,7 @@ class HomePageState extends State<HomePage> {
                               crossAxisAlignment: CrossAxisAlignment.center,
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Image.asset(getWeatcherCondtion(_weatherCondition, _weatherConditionIcon, 1)),
+                                Image.asset(getWeatherCondition(_weatherCondition, _weatherConditionIcon, 1)),
                                 const SizedBox(height: 10),
                                 Container(
                                   decoration: BoxDecoration(
@@ -516,6 +529,7 @@ class HomePageState extends State<HomePage> {
                                   Border.all(color: Colors.black, width: 1.0),
                               borderRadius: BorderRadius.circular(10)),
                           child: TextField(
+                            focusNode: _searchFocusNode,
                             controller: _searchController,
                             inputFormatters: [
                               FilteringTextInputFormatter.allow(
