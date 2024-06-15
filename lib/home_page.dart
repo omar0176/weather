@@ -422,7 +422,47 @@ class HomePageState extends State<HomePage> {
                               children: [
                                 Image.asset(getWeatherCondition(_weatherCondition, _weatherConditionIcon, 1)),
                                 const SizedBox(height: 10),
-                                Container(
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(20),
+                                  child: BackdropFilter(
+                                    filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: const Color(0xFFB2E4FA)
+                                                .withOpacity(0.3),
+                                            offset: const Offset(0, 4),
+                                            blurRadius: 4,
+                                            spreadRadius: 0,
+                                          ),
+                                        ],
+                                        color: Colors.white.withOpacity(0.3),
+                                        borderRadius: BorderRadius.circular(20),
+                                      ),
+                                      padding: const EdgeInsets.all(16),
+                                      child: Column(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        children: [
+                                          Text('$_temperature°',
+                                              style: const TextStyle(fontSize: 80)),
+                                          Text(_weatherDescription),
+                                          Text('H:$_highTemp    L:$_lowTemp'),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 32),
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(20),
+                              child: BackdropFilter(
+                                filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+                                child: Container(
                                   decoration: BoxDecoration(
                                     boxShadow: [
                                       BoxShadow(
@@ -437,69 +477,40 @@ class HomePageState extends State<HomePage> {
                                     borderRadius: BorderRadius.circular(20),
                                   ),
                                   padding: const EdgeInsets.all(16),
-                                  margin: const EdgeInsets.all(16),
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      Text('$_temperature°',
-                                          style: const TextStyle(fontSize: 80)),
-                                      Text(_weatherDescription),
-                                      Text('H:$_highTemp    L:$_lowTemp'),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                            Container(
-                              decoration: BoxDecoration(
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: const Color(0xFFB2E4FA)
-                                        .withOpacity(0.3),
-                                    offset: const Offset(0, 4),
-                                    blurRadius: 4,
-                                    spreadRadius: 0,
-                                  ),
-                                ],
-                                color: Colors.white.withOpacity(0.3),
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              padding: const EdgeInsets.all(16),
-                              margin: const EdgeInsets.all(16),
-                              child: SingleChildScrollView(
-                                scrollDirection: Axis.horizontal,
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: _hourlyForecast.map((forecast) {
-                                    return Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 10.0),
-                                      child: Column(
-                                        children: [
-                                          Center(
-                                            child: Text(
-                                              DateFormat('HH:mm')
-                                                  .format(forecast['time']),
-                                            ),
-                                          ),
-                                          Image.asset(getWeatherIcon(
-                                              forecast['weatherIcon'])),
-                                          Center(
-                                            child: Text(
-                                              '${forecast['temperature']}°',
-                                              style: const TextStyle(
-                                                fontSize: 20,
-                                                fontWeight: FontWeight.bold,
+                                  child: SingleChildScrollView(
+                                    scrollDirection: Axis.horizontal,
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      children: _hourlyForecast.map((forecast) {
+                                        return Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 10.0),
+                                          child: Column(
+                                            children: [
+                                              Center(
+                                                child: Text(
+                                                  DateFormat('HH:mm')
+                                                      .format(forecast['time']),
+                                                ),
                                               ),
-                                            ),
+                                              Image.asset(getWeatherIcon(
+                                                  forecast['weatherIcon'])),
+                                              Center(
+                                                child: Text(
+                                                  '${forecast['temperature']}°',
+                                                  style: const TextStyle(
+                                                    fontSize: 20,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
                                           ),
-                                        ],
-                                      ),
-                                    );
-                                  }).toList(),
+                                        );
+                                      }).toList(),
+                                    ),
+                                  ),
                                 ),
                               ),
                             ),
