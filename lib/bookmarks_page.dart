@@ -13,14 +13,14 @@ class BookmarksPage extends StatefulWidget {
   BookmarksPageState createState() => BookmarksPageState();
 }
 
-class Bookmark {
+class Bookmark { // Class to store bookmark data
   final String location;
   final String country;
   final String temperature;
   final String highTemp;
   final String lowTemp;
 
-  Bookmark({
+  Bookmark({ // Constructor for the Bookmark class
     required this.location,
     required this.country,
     required this.temperature,
@@ -30,9 +30,9 @@ class Bookmark {
 }
 
 class BookmarksPageState extends State<BookmarksPage> {
-  final String _apiKeyOpenweather = 'ca7125e0df61234bbfddef29c1ababde';
+  final String _apiKeyOpenweather = 'ca7125e0df61234bbfddef29c1ababde'; // OpenWeather API key
 
-  final List<Bookmark> _bookmarks = [];
+  final List<Bookmark> _bookmarks = []; // List to store bookmarks
 
   bool _isDialogVisible = false; // Variable to toggle the dialog box
 
@@ -73,19 +73,18 @@ class BookmarksPageState extends State<BookmarksPage> {
     final response = await http.get(Uri.parse(
         'https://api.openweathermap.org/data/2.5/weather?lat=$latitude&lon=$longitude&units=metric&appid=$_apiKeyOpenweather'));
 
-    if (response.statusCode == 200) {
+    if (response.statusCode == 200) { // 200 : successful response
       final Map<String, dynamic> data = json.decode(response.body);
-      setState(() {
-        _location = data['name'];
-        _country = data['sys']['country'];
-        _temperature =
-            double.parse(data['main']['temp'].toString()).toStringAsFixed(0);
-        _highTemp = double.parse(data['main']['temp_max'].toString())
-            .toStringAsFixed(0);
-        _lowTemp = double.parse(data['main']['temp_min'].toString())
-            .toStringAsFixed(0);
-        _modifyBookmark(_location, _country, _temperature, _highTemp,
-            _lowTemp); // Call _modifyBookmark here
+      setState(() {// collects the weather data from the json response
+        _location = data['name']; // Gets the location name
+        _country = data['sys']['country'];// Gets the country name
+        //gets the temp, converts it to a string, then rounds it to the nearest whole number
+        _temperature = double.parse(data['main']['temp'].toString()).toStringAsFixed(0);
+        // gets high and low temp, converts it to a string, then rounds it to the nearest whole number
+        _highTemp = double.parse(data['main']['temp_max'].toString()).toStringAsFixed(0);
+        _lowTemp = double.parse(data['main']['temp_min'].toString()).toStringAsFixed(0);
+
+        _modifyBookmark(_location, _country, _temperature, _highTemp, _lowTemp); // Call _modifyBookmark here
       });
     } else {
       setState(() {
@@ -112,7 +111,7 @@ class BookmarksPageState extends State<BookmarksPage> {
       }
     } catch (e) {
       // If the location doesn't exist
-      setState(() {
+      setState(() { // Shows a pop-up dialog
         showDialog(
             context: context,
             builder: (BuildContext context) {
@@ -140,14 +139,14 @@ class BookmarksPageState extends State<BookmarksPage> {
 
 // Load bookmarks from SharedPreferences
   Future<void> _loadBookmarks() async {
-    final prefs = await SharedPreferences.getInstance();
-    final String? encodedBookmarks = prefs.getString('bookmarks');
+    final prefs = await SharedPreferences.getInstance(); // Get the SharedPreferences instance
+    final String? encodedBookmarks = prefs.getString('bookmarks');// Get the encoded bookmarks from SharedPreferences
     if (encodedBookmarks != null) {
-      final List<dynamic> decodedBookmarks = json.decode(encodedBookmarks);
+      final List<dynamic> decodedBookmarks = json.decode(encodedBookmarks); // Decode the bookmarks
       setState(() {
         // Add decoded bookmarks to the _bookmarks list
         _bookmarks.addAll(decodedBookmarks.map((bookmark) {
-          return Bookmark(
+          return Bookmark( // Create a new Bookmark object
             location: bookmark['location'],
             country: bookmark['country'],
             temperature: bookmark['temperature'],
@@ -251,12 +250,12 @@ class BookmarksPageState extends State<BookmarksPage> {
                       color: Colors.black,
                     ),),
                   )
-                : ListView.builder(
+                : ListView.builder( // List of bookmarks in the page
                     itemCount: _bookmarks.length,
                     itemBuilder: (context, index) {
                       final bookmark = _bookmarks[index];
                       return Container(
-                        decoration: BoxDecoration(
+                        decoration: BoxDecoration( // Bookmark container decoration
                           boxShadow: const [
                             BoxShadow(
                               color: Color(0xFFB2E4FA),
@@ -270,7 +269,7 @@ class BookmarksPageState extends State<BookmarksPage> {
                         ),
                         padding: const EdgeInsets.all(5),
                         margin: const EdgeInsets.all(3),
-                        child: ListTile(
+                        child: ListTile( // Bookmark list tile_structure
                           title: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
@@ -289,7 +288,7 @@ class BookmarksPageState extends State<BookmarksPage> {
                                   'L:${bookmark.lowTemp}°  H:${bookmark.highTemp}°'), // Use bookmark.lowTemp and bookmark.highTemp
                             ],
                           ),
-                          onLongPress: () {
+                          onLongPress: () { // Long press to delete a bookmark
                             showDialog(
                               context: context,
                               builder: (BuildContext context) {
@@ -330,7 +329,7 @@ class BookmarksPageState extends State<BookmarksPage> {
                     },
                   ),
           ),
-          if (_isDialogVisible)
+          if (_isDialogVisible) // Text box to add a bookmark
             GestureDetector(
               // to close the text box when tapped away
               onTap: () {
@@ -342,7 +341,7 @@ class BookmarksPageState extends State<BookmarksPage> {
               },
               child: Container(
                 color: Colors.transparent,
-                child: BackdropFilter(
+                child: BackdropFilter( // Backdrop filter to blur the background
                   filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
                   child: Container(
                     color: Colors.black.withOpacity(0.5),
@@ -360,9 +359,9 @@ class BookmarksPageState extends State<BookmarksPage> {
                               borderRadius: BorderRadius.circular(10),
                             ),
                             child: TextField(
-                              focusNode: _searchFocusNode,
-                              controller: _searchController,
-                              inputFormatters: [
+                              focusNode: _searchFocusNode, // Focus node for the text box
+                              controller: _searchController, // Controller for the text box
+                              inputFormatters: [ // Input formatter to allow only alphabets, commas, and spaces
                                 FilteringTextInputFormatter.allow(
                                   RegExp(r'[a-zA-Z,\s]'),
                                 ),
@@ -393,7 +392,7 @@ class BookmarksPageState extends State<BookmarksPage> {
             ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: FloatingActionButton( // Floating action button to add a bookmark
         onPressed: () {
           _toggleTextBox();
         },

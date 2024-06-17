@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:weather/window.dart';
+import 'package:weather/navigation.dart';
 
 
 void main() {
@@ -12,8 +12,8 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: MainWindow(), // forwards to the main page of the app
+      debugShowCheckedModeBanner: false, // hides the debug banner
+      home: Navigation(), // forwards to the main page of the app
     );
   }
 }

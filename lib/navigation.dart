@@ -1,56 +1,55 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:weather/bookmarks_page.dart';
 import 'package:weather/settings_page.dart';
 import 'home_page.dart';
 
 // Base UI and navigation structure
-class MainWindow extends StatefulWidget {
-  const MainWindow({super.key});
+class Navigation extends StatefulWidget {
+  const Navigation({super.key});
 
   @override
-  State<MainWindow> createState() => _MainWindowState();
+  State<Navigation> createState() => _NavigationState();
 }
 
 int currentPageIndex = 0; // Index of the current page
 
-class _MainWindowState extends State<MainWindow> {
+class _NavigationState extends State<Navigation> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
+      debugShowCheckedModeBanner: false, // hides the debug banner
       home: SafeArea(
         child: Scaffold(
-          appBar: AppBar(
+          appBar: AppBar( // Top app bar with title
             title: const Center(
-              child: Text('Aeolus'), // App title
+              child: Text('Nimbus'), // App title
             ),
             backgroundColor:
             Colors.white.withOpacity(0.5), // Title background color
           ),
           backgroundColor: const Color(0xFFDCE3EA), // Page background color
           bottomNavigationBar: NavigationBar(
-            indicatorColor: Colors.green, // Indicator color
+            indicatorColor: Colors.green, // NavBar Indicator color
             backgroundColor: Colors.white
-                .withOpacity(0.5), // navigation bar background color
+                .withOpacity(0.5), // NavBar background color
             onDestinationSelected: (int index) {
-              setState(() {
+              setState(() { // function to update the state of the Widget
                 currentPageIndex = index; // Sets the current page index
               });
             },
-            destinations: const [
+            destinations: const [ // List of navigation options
               // Navigation destinations
-              NavigationDestination(
+              NavigationDestination(             // Home page
                 icon: Icon(Icons.home_outlined),
                 selectedIcon: Icon(Icons.home),
                 label: 'Home',
               ),
-              NavigationDestination(
-                icon: Icon(CupertinoIcons.bookmark),
+              NavigationDestination(             // Bookmarks page
+                icon: Icon(Icons.bookmark_border_outlined),
                 selectedIcon: Icon(Icons.bookmark),
                 label: 'Bookmarks',
               ),
-              NavigationDestination(
+              NavigationDestination(             // Settings page
                 icon: Icon(Icons.settings_outlined),
                 selectedIcon: Icon(Icons.settings),
                 label: 'Settings',
@@ -58,7 +57,7 @@ class _MainWindowState extends State<MainWindow> {
             ],
             selectedIndex: currentPageIndex, // Selected index
           ),
-          body: IndexedStack(
+          body: IndexedStack( //keeps state of other pages while displaying a specific one
             index: currentPageIndex,
             children: const [
               HomePage(),
