@@ -371,46 +371,52 @@ class HomePageState extends State<HomePage> {
                         child: Column( // column for the content
                           children: [
                             const SizedBox(height: 20),
-                            Row(  // row location button
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                OutlinedButton.icon( // creates the button with an icon
-                                  onPressed: _toggleTextBox,
-                                  icon: const Icon(
-                                    Icons.search,
-                                    color: Colors.black,
-                                  ),
-                                  style: OutlinedButton.styleFrom(
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(10),
+                            Center(
+                              child: Wrap(  // Wrap location button
+                                alignment: WrapAlignment.center,
+                                children: [
+                                  OutlinedButton.icon(// creates the button with an icon
+                                    onPressed: _toggleTextBox,
+                                    icon: const Icon(
+                                      Icons.search,
+                                      color: Colors.black,
                                     ),
-                                    side: const BorderSide(
-                                      width: 1,
-                                      color: Colors.grey,
+                                    style: OutlinedButton.styleFrom(
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      side: const BorderSide(
+                                        width: 1,
+                                        color: Colors.grey,
+                                      ),
+                                    ),
+                                    label: FittedBox(
+                                      fit: BoxFit.scaleDown,
+                                      child: Text(_isSearchlocation? _location :'My Location',
+                                        style: TextStyle(
+                                          fontSize: 46,
+                                          fontWeight: FontWeight.w500,
+                                          color: isNight() ? Colors.white : Colors.black,
+                                        ),
+                                      ),
                                     ),
                                   ),
-                                  label: Text('My Location',
-                                    style: TextStyle(
-                                      fontSize: 46,
-                                      fontWeight: FontWeight.w500,
-                                      color: isNight() ? Colors.white : Colors.black,
+                                  const SizedBox(width: 10), // Add some space between the buttons
+                                  if (_isSearchlocation) // if the search location is viewed, show the refresh button
+                                    Align(
+                                      child: FloatingActionButton.small( // back to current_position button
+                                        onPressed: () {
+                                          switchToGeolocation();
+                                        },
+                                        backgroundColor: const Color(0xFFDCE3EA),
+                                        child: const Icon(Icons.refresh),
+                                      ),
                                     ),
-                                  ),
-                                ),
-                                const SizedBox(width: 10), // Add some space between the buttons
-                                if (_isSearchlocation) // if the search location is viewed, show the refresh button
-                                  FloatingActionButton.small(
-                                    onPressed: () {
-                                      switchToGeolocation();
-                                    },
-                                    backgroundColor: const Color(0xFFDCE3EA),
-                                    child: const Icon(Icons.refresh),
-                                  ),
-                              ],
+                                ],
+                              ),
                             ),
                             Center( // location
-                              child: Text(
-                                _location,
+                              child: Text(_isSearchlocation? '':_location,
                                 style: TextStyle(
                                     fontWeight: FontWeight.bold,
                                     fontSize: 24,
