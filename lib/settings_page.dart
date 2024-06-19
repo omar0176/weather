@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart'; // to help reuse objects across the app
 import 'package:url_launcher/url_launcher.dart'; // package to launch URLs
+import 'utils.dart'; // Utils class
 
 final Uri _url = Uri.parse('https://www.mercedes-benz-berlin.de/passengercars/startpage.html'); // URL to open
 
 class SettingsPage extends StatelessWidget {
-  const SettingsPage({super.key});
+  SettingsPage({super.key});
+  final Utils unit = Utils(); // Instance of the Utils class
 
   @override
   Widget build(BuildContext context) {
+    Utils unit = Provider.of<Utils>(context);
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.all(
@@ -28,7 +32,46 @@ class SettingsPage extends StatelessWidget {
               title: const Text('Theme'),
               subtitle: const Text('Switch between appearance mode'),
               onTap: () {
-                // Navigate to help & support
+                // Navigate to theme settings
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.settings_input_component_outlined), //change it to whatever icon you want
+              title: const Text('Units'),
+              subtitle: const Text('Change units of measurement'),
+              onTap: () {
+                showModalBottomSheet(context: context,
+                  builder: (context) {
+                    return StatefulBuilder(
+                      builder: (context, setState) {
+                        return Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            RadioListTile<String>(
+                              title: const Text('Celsius'),
+                              value: 'Celsius',
+                              groupValue: unit.isCelsius? 'Celsius' : 'Fahrenheit',
+                              onChanged: (value) {
+                                setState(() {
+                                  unit.setIsCelsius(true);
+                                });
+                              },
+                            ),RadioListTile<String>(
+                              title: const Text('Fahrenheit'),
+                              value: 'Fahrenheit',
+                              groupValue: unit.isCelsius? 'Celsius' : 'Fahrenheit',
+                              onChanged: (value) {
+                                setState(() {
+                                  unit.setIsCelsius(false);
+                                });
+                              },
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                  },
+                );
               },
             ),
             ListTile(

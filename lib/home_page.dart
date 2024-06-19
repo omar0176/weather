@@ -5,7 +5,9 @@ import 'package:flutter/services.dart'; // Input formatting package
 import 'package:geolocator/geolocator.dart'; // Geolocation package
 import 'package:http/http.dart' as http; // HTTP package
 import 'package:intl/intl.dart'; // Date and time formatting package
-import 'package:geocoding/geocoding.dart'; // Geocoding package
+import 'package:geocoding/geocoding.dart';
+import 'package:provider/provider.dart';
+import 'package:weather/utils.dart'; // Geocoding package
 
 // Stateful Widget for the main screen of the app.
 class HomePage extends StatefulWidget {
@@ -263,11 +265,11 @@ class HomePageState extends State<HomePage> {
     _fetchHourlyForecast(_currentLatitude, _currentLongitude);
 
     setState(() {
-      _isSearchlocation = false; // lets the app know that the searcg location is not viewed
+      _isSearchlocation = false; // lets the app know that the search location is not viewed
     });
   }
 
-  // uodates weather condition images and symbols based on the weather condition
+  // updates weather condition images and symbols based on the weather condition
   String getWeatherCondition(
       int weatherId, String weatherIconCode, int upperOrLower) {
     // 1 is upper and 0 is lower
@@ -340,6 +342,7 @@ class HomePageState extends State<HomePage> {
   // Build method for the UI of the main screen
   @override
   Widget build(BuildContext context) {
+    Utils unit = Provider.of<Utils>(context);
     return Scaffold(
       backgroundColor:
           isNight() ? const Color(0xFF2F3542) : const Color(0xFFDCE3EA),
@@ -455,10 +458,10 @@ class HomePageState extends State<HomePage> {
                                         crossAxisAlignment:
                                             CrossAxisAlignment.center,
                                         children: [
-                                          Text('$_temperature°',
+                                          Text(unit.convertToFahrenheit(_temperature),
                                               style: const TextStyle(fontSize: 80)),
                                           Text(_weatherDescription),
-                                          Text('H:$_highTemp    L:$_lowTemp'),
+                                          Text('H:${unit.convertToFahrenheit(_highTemp)}    L:${unit.convertToFahrenheit(_lowTemp)}'),
                                         ],
                                       ),
                                     ),
@@ -508,7 +511,7 @@ class HomePageState extends State<HomePage> {
                                                   forecast['weatherIcon'])),
                                               Center(
                                                 child: Text(
-                                                  '${forecast['temperature']}°',
+                                                  '${unit.convertToFahrenheit(forecast['temperature'])}',
                                                   style: const TextStyle(
                                                     fontSize: 20,
                                                     fontWeight: FontWeight.bold,

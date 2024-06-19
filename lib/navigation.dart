@@ -59,9 +59,9 @@ class _NavigationState extends State<Navigation> {
           ),
           body: IndexedStack( //keeps state of other pages while displaying a specific one
             index: currentPageIndex,
-            children: const [
-              HomePage(),
-              BookmarksPage(),
+            children: [
+              const HomePage(),
+              const BookmarksPage(),
               SettingsPage(),
             ],
           ),

@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:weather/navigation.dart';
+import 'package:weather/utils.dart';
 
 
 void main() {
-  runApp(const MyApp());
+  runApp(ChangeNotifierProvider(
+    create: (context) => Utils(),
+    child: const MyApp(),
+  ),);
 }
 
 class MyApp extends StatelessWidget {

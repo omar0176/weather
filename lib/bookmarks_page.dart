@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'dart:ui';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:geocoding/geocoding.dart';
-
+import 'utils.dart';
 class BookmarksPage extends StatefulWidget {
   const BookmarksPage({super.key});
 
@@ -237,6 +238,7 @@ class BookmarksPageState extends State<BookmarksPage> {
 // Build the bookmarks page UI
   @override
   Widget build(BuildContext context) {
+    Utils unit = Provider.of<Utils>(context);
     return Scaffold(
       body: Stack(
         children: [
@@ -273,10 +275,8 @@ class BookmarksPageState extends State<BookmarksPage> {
                           title: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text(bookmark
-                                  .location), // Use bookmark.location instead of _location
-                              Text(
-                                  '${bookmark.temperature}°'), // Use bookmark.temperature instead of _temperature
+                              Text(bookmark.location), // Use bookmark.location instead of _location
+                              Text(unit.convertToFahrenheit(bookmark.temperature)), // Use bookmark.temperature instead of _temperature
                             ],
                           ),
                           subtitle: Row(
@@ -285,7 +285,7 @@ class BookmarksPageState extends State<BookmarksPage> {
                               Text(bookmark
                                   .country), // Use bookmark.country instead of _country
                               Text(
-                                  'L:${bookmark.lowTemp}°  H:${bookmark.highTemp}°'), // Use bookmark.lowTemp and bookmark.highTemp
+                                  'L:${unit.convertToFahrenheit(bookmark.lowTemp)}  H:${unit.convertToFahrenheit(bookmark.highTemp)}'), // Use bookmark.lowTemp and bookmark.highTemp
                             ],
                           ),
                           onLongPress: () { // Long press to delete a bookmark
@@ -311,7 +311,7 @@ class BookmarksPageState extends State<BookmarksPage> {
                                     TextButton(
                                       child: const Text(
                                         'Delete',
-                                        style: TextStyle(color: Colors.red),
+                                        style:  TextStyle(color: Colors.red),
                                       ),
                                       onPressed: () {
                                         _deleteBookmark(
