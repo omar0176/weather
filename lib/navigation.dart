@@ -20,36 +20,48 @@ class _NavigationState extends State<Navigation> {
       debugShowCheckedModeBanner: false, // hides the debug banner
       home: SafeArea(
         child: Scaffold(
-          appBar: AppBar( // Top app bar with title
+          appBar: AppBar(
+            // Top app bar with title
             title: const Center(
-              child: Text('Nimbus'), // App title
+              child: Text(
+                'Nimbus',
+                style: TextStyle(
+                  fontSize: 30.0,
+                  fontFamily: 'JosefinSlab-Bold',
+                ),
+              ), // App title
             ),
             backgroundColor:
-            Colors.white.withOpacity(0.5), // Title background color
+                Colors.white.withOpacity(0.5), // Title background color
           ),
           backgroundColor: const Color(0xFFDCE3EA), // Page background color
           bottomNavigationBar: NavigationBar(
             indicatorColor: Colors.green, // NavBar Indicator color
-            backgroundColor: Colors.white
-                .withOpacity(0.5), // NavBar background color
+            backgroundColor:
+                Colors.white.withOpacity(0.5), // NavBar background color
             onDestinationSelected: (int index) {
-              setState(() { // function to update the state of the Widget
+              setState(() {
+                // function to update the state of the Widget
                 currentPageIndex = index; // Sets the current page index
               });
             },
-            destinations: const [ // List of navigation options
+            destinations: const [
+              // List of navigation options
               // Navigation destinations
-              NavigationDestination(             // Home page
+              NavigationDestination(
+                // Home page
                 icon: Icon(Icons.home_outlined),
                 selectedIcon: Icon(Icons.home),
                 label: 'Home',
               ),
-              NavigationDestination(             // Bookmarks page
+              NavigationDestination(
+                // Bookmarks page
                 icon: Icon(Icons.bookmark_border_outlined),
                 selectedIcon: Icon(Icons.bookmark),
                 label: 'Bookmarks',
               ),
-              NavigationDestination(             // Settings page
+              NavigationDestination(
+                // Settings page
                 icon: Icon(Icons.settings_outlined),
                 selectedIcon: Icon(Icons.settings),
                 label: 'Settings',
@@ -57,7 +69,8 @@ class _NavigationState extends State<Navigation> {
             ],
             selectedIndex: currentPageIndex, // Selected index
           ),
-          body: IndexedStack( //keeps state of other pages while displaying a specific one
+          body: IndexedStack(
+            //keeps state of other pages while displaying a specific one
             index: currentPageIndex,
             children: [
               const HomePage(),
