@@ -392,7 +392,8 @@ class BookmarksPageState extends State<BookmarksPage> {
             ),
         ],
       ),
-      floatingActionButton: FloatingActionButton( // Floating action button to add a bookmark
+      floatingActionButton: FloatingActionButton(// Floating action button to add a bookmark
+        backgroundColor: Colors.grey[200],
         onPressed: () {
           _toggleTextBox();
         },

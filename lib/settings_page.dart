@@ -20,22 +20,6 @@ class SettingsPage extends StatelessWidget {
           // List of settings
           children: [
             ListTile(
-              leading: const Icon(Icons.language),
-              title: const Text('Language'),
-              subtitle: const Text('Change language preferences'),
-              onTap: () {
-                // Navigate to language settings
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.light_mode_outlined),
-              title: const Text('Theme'),
-              subtitle: const Text('Switch between appearance mode'),
-              onTap: () {
-                // Navigate to theme settings
-              },
-            ),
-            ListTile(
               leading: const Icon(Icons.settings_input_component_outlined), //change it to whatever icon you want
               title: const Text('Units'),
               subtitle: const Text('Change units of measurement'),

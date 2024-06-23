@@ -36,7 +36,7 @@ class _NavigationState extends State<Navigation> {
           ),
           backgroundColor: const Color(0xFFDCE3EA), // Page background color
           bottomNavigationBar: NavigationBar(
-            indicatorColor: Colors.green, // NavBar Indicator color
+            indicatorColor: Colors.grey, // NavBar Indicator color
             backgroundColor:
                 Colors.white.withOpacity(0.5), // NavBar background color
             onDestinationSelected: (int index) {
