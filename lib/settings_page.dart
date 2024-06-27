@@ -3,7 +3,7 @@ import 'package:provider/provider.dart'; // to help reuse objects across the app
 import 'package:url_launcher/url_launcher.dart'; // package to launch URLs
 import 'utils.dart'; // Utils class
 
-final Uri _url = Uri.parse('https://www.mercedes-benz-berlin.de/passengercars/startpage.html'); // URL to open
+final Uri _url = Uri.parse('https://vanishjr.github.io/nimbus-website/index.html'); // URL to open
 
 class SettingsPage extends StatelessWidget {
   SettingsPage({super.key});
