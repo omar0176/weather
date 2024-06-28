@@ -1,24 +1,27 @@
-import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:weather/navigation.dart';
-import 'package:weather/utils.dart';
-
+import 'package:flutter/material.dart'; 
+import 'package:provider/provider.dart'; // package for state management
+import 'package:weather/navigation.dart'; 
+import 'package:weather/utils.dart'; 
 
 void main() {
-  runApp(ChangeNotifierProvider(
-    create: (context) => Utils(),
-    child: const MyApp(),
-  ),);
+  // initializes the app 
+  runApp(
+    ChangeNotifierProvider(
+      // Providing an instance of Utils to the widget tree
+      create: (context) => Utils(),
+      child: const MyApp(), 
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  const MyApp({super.key}); // Constructor 
 
   @override
   Widget build(BuildContext context) {
     return const MaterialApp(
-      debugShowCheckedModeBanner: false, // hides the debug banner
-      home: Navigation(), // forwards to the main page of the app
+      debugShowCheckedModeBanner: false, 
+      home: Navigation(), // Sets the home property to the Nav widget
     );
   }
 }
