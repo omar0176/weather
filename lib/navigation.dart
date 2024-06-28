@@ -1,53 +1,49 @@
 import 'package:flutter/material.dart';
-import 'package:weather/bookmarks_page.dart';
-import 'package:weather/settings_page.dart';
 import 'home_page.dart';
+import 'package:weather/bookmarks_page.dart'; 
+import 'package:weather/settings_page.dart'; 
 
-// Base UI and navigation structure
 class Navigation extends StatefulWidget {
-  const Navigation({super.key});
+  const Navigation({super.key}); // Constructor
 
   @override
-  State<Navigation> createState() => _NavigationState();
+  State<Navigation> createState() => _NavigationState(); 
 }
 
-int currentPageIndex = 0; // Index of the current page
+// Index of the current page
+int currentPageIndex = 0;
 
 class _NavigationState extends State<Navigation> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false, // hides the debug banner
+      debugShowCheckedModeBanner: false,
       home: SafeArea(
         child: Scaffold(
           appBar: AppBar(
             // Top app bar with title
             title: const Center(
               child: Text(
-                'Nimbus',
+                'Nimbus', 
                 style: TextStyle(
                   fontSize: 30.0,
                   fontFamily: 'JosefinSlab-Bold',
                 ),
-              ), // App title
+              ),
             ),
-            backgroundColor:
-                Colors.white.withOpacity(0.5), // Title background color
+            backgroundColor: Colors.white.withOpacity(0.5), 
           ),
           backgroundColor: const Color(0xFFDCE3EA), // Page background color
           bottomNavigationBar: NavigationBar(
-            indicatorColor: Colors.grey, // NavBar Indicator color
-            backgroundColor:
-                Colors.white.withOpacity(0.5), // NavBar background color
+            indicatorColor: Colors.grey, // indicator color
+            backgroundColor: Colors.white.withOpacity(0.5), // NavBar background 
             onDestinationSelected: (int index) {
               setState(() {
-                // function to update the state of the Widget
                 currentPageIndex = index; // Sets the current page index
               });
             },
             destinations: const [
-              // List of navigation options
-              // Navigation destinations
+              // List of options
               NavigationDestination(
                 // Home page
                 icon: Icon(Icons.home_outlined),
@@ -70,12 +66,12 @@ class _NavigationState extends State<Navigation> {
             selectedIndex: currentPageIndex, // Selected index
           ),
           body: IndexedStack(
-            //keeps state of other pages while displaying a specific one
+            // Keeps the state of other pages while displaying a specific one
             index: currentPageIndex,
             children: [
-              const HomePage(),
-              const BookmarksPage(),
-              SettingsPage(),
+              const HomePage(), 
+              const BookmarksPage(), 
+              SettingsPage(), 
             ],
           ),
         ),
